@@ -1,6 +1,8 @@
 package techan
 
-import "github.com/sdcoffey/big"
+import (
+	"github.com/ericlagergren/decimal"
+)
 
 type trueRangeIndicator struct {
 	series *TimeSeries
@@ -15,16 +17,23 @@ func NewTrueRangeIndicator(series *TimeSeries) Indicator {
 	}
 }
 
-func (tri trueRangeIndicator) Calculate(index int) big.Decimal {
+func (tri trueRangeIndicator) Calculate(index int) *decimal.Big {
 	if index-1 < 0 {
-		return big.ZERO
+		return &decimal.Big{}
 	}
 
 	candle := tri.series.Candles[index]
 	previousClose := tri.series.Candles[index-1].ClosePrice
 
-	trueHigh := big.MaxSlice(candle.MaxPrice, previousClose)
-	trueLow := big.MinSlice(candle.MinPrice, previousClose)
+	trueHigh := previousClose
+	if candle.MaxPrice.Cmp(previousClose) == 1 {
+		trueHigh = candle.MaxPrice
+	}
 
-	return trueHigh.Sub(trueLow)
+	trueLow := previousClose
+	if candle.MinPrice.Cmp(previousClose) == -1 {
+		trueLow = candle.MinPrice
+	}
+
+	return new(decimal.Big).Sub(trueHigh, trueLow)
 }

@@ -1,10 +1,10 @@
 package example
 
 import (
+	"github.com/ericlagergren/decimal"
 	"strconv"
 	"time"
 
-	"github.com/sdcoffey/big"
 	"github.com/sdcoffey/techan"
 )
 
@@ -24,10 +24,10 @@ func BasicEma() techan.Indicator {
 		period := techan.NewTimePeriod(time.Unix(start, 0), time.Hour*24)
 
 		candle := techan.NewCandle(period)
-		candle.OpenPrice = big.NewFromString(datum[1])
-		candle.ClosePrice = big.NewFromString(datum[2])
-		candle.MaxPrice = big.NewFromString(datum[3])
-		candle.MinPrice = big.NewFromString(datum[4])
+		candle.OpenPrice, _ = new(decimal.Big).SetString(datum[1])
+		candle.ClosePrice, _ = new(decimal.Big).SetString(datum[2])
+		candle.MaxPrice, _ = new(decimal.Big).SetString(datum[3])
+		candle.MinPrice, _ = new(decimal.Big).SetString(datum[4])
 
 		series.AddCandle(candle)
 	}

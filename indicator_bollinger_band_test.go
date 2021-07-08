@@ -1,15 +1,17 @@
 package techan
 
 import (
+	"github.com/ericlagergren/decimal"
 	"strings"
 	"testing"
 
-	"github.com/sdcoffey/big"
 	"github.com/stretchr/testify/assert"
 )
 
-func decimalAlmostEquals(t *testing.T, expected, actual big.Decimal, epsilon float64) {
-	assert.InEpsilon(t, expected.Float(), actual.Float(), epsilon)
+func decimalAlmostEquals(t *testing.T, expected, actual *decimal.Big, epsilon float64) {
+	fe, _ := expected.Float64()
+	fa, _ := actual.Float64()
+	assert.InEpsilon(t, fe, fa, epsilon)
 }
 
 // number data from https://school.stockcharts.com/doku.php?id=technical_indicators:bollinger_bands
@@ -110,12 +112,20 @@ func TestBollingerBandIndicator(t *testing.T) {
 	bbUP := NewBollingerUpperBandIndicator(src, window, sigma)
 	bbLO := NewBollingerLowerBandIndicator(src, window, sigma)
 
+	tmp := &decimal.Big{}
+	tmp1 := &decimal.Big{}
 	for i := window - 1; i < len(ts.Candles); i++ {
 		j := i - (window - 1)
-		decimalAlmostEquals(t, big.NewFromString(SMAs[j]), sma.Calculate(i), 0.01)
-		decimalAlmostEquals(t, big.NewFromString(STDEVs[j]), wstd.Calculate(i), 0.01)
-		decimalAlmostEquals(t, big.NewFromString(BBUPs[j]), bbUP.Calculate(i), 0.01)
-		decimalAlmostEquals(t, big.NewFromString(BBLOs[j]), bbLO.Calculate(i), 0.01)
-		decimalAlmostEquals(t, big.NewFromString(BBWs[j]), bbUP.Calculate(i).Sub(bbLO.Calculate((i))), 0.01)
+		tmp, _ = tmp.SetString(SMAs[j])
+		decimalAlmostEquals(t, tmp, sma.Calculate(i), 0.01)
+		tmp, _ = tmp.SetString(STDEVs[j])
+		decimalAlmostEquals(t, tmp, wstd.Calculate(i), 0.01)
+		tmp, _ = tmp.SetString(BBUPs[j])
+		decimalAlmostEquals(t, tmp, bbUP.Calculate(i), 0.01)
+		tmp, _ = tmp.SetString(BBLOs[j])
+		decimalAlmostEquals(t, tmp, bbLO.Calculate(i), 0.01)
+		tmp, _ = tmp.SetString(BBWs[j])
+		tmp1 = bbUP.Calculate(i)
+		decimalAlmostEquals(t, tmp, tmp1.Sub(tmp1, bbLO.Calculate(i)), 0.01)
 	}
 }

@@ -1,11 +1,13 @@
 package techan
 
-import "github.com/sdcoffey/big"
+import (
+	"github.com/ericlagergren/decimal"
+)
 
 type bbandIndicator struct {
 	ma     Indicator
 	stdev  Indicator
-	muladd big.Decimal
+	muladd decimal.Big
 }
 
 // NewBollingerUpperBandIndicator a a derivative indicator which returns the upper bound of a bollinger band
@@ -14,7 +16,7 @@ func NewBollingerUpperBandIndicator(indicator Indicator, window int, sigma float
 	return bbandIndicator{
 		ma:     NewSimpleMovingAverage(indicator, window),
 		stdev:  NewWindowedStandardDeviationIndicator(indicator, window),
-		muladd: big.NewDecimal(sigma),
+		muladd: *new(decimal.Big).SetFloat64(sigma),
 	}
 }
 
@@ -24,10 +26,12 @@ func NewBollingerLowerBandIndicator(indicator Indicator, window int, sigma float
 	return bbandIndicator{
 		ma:     NewSimpleMovingAverage(indicator, window),
 		stdev:  NewWindowedStandardDeviationIndicator(indicator, window),
-		muladd: big.NewDecimal(-sigma),
+		muladd: *new(decimal.Big).SetFloat64(-sigma),
 	}
 }
 
-func (bbi bbandIndicator) Calculate(index int) big.Decimal {
-	return bbi.ma.Calculate(index).Add(bbi.stdev.Calculate(index).Mul(bbi.muladd))
+func (bbi bbandIndicator) Calculate(index int) *decimal.Big {
+	tmp := bbi.ma.Calculate(index)
+	// bbi.ma.Calculate(index) + bbi.stdev.Calculate(index) * bbi.muladd
+	return tmp.FMA(bbi.stdev.Calculate(index), &bbi.muladd, tmp)
 }

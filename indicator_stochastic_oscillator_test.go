@@ -1,10 +1,9 @@
 package techan
 
 import (
-	"math"
+	"github.com/ericlagergren/decimal"
 	"testing"
 
-	"github.com/sdcoffey/big"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -81,5 +80,5 @@ func TestFastStochasticIndicatorNoPriceChange(t *testing.T) {
 	)
 
 	k := NewFastStochasticIndicator(ts, 2)
-	assert.Equal(t, big.NewDecimal(math.Inf(1)).FormattedString(2), k.Calculate(1).FormattedString(2))
+	assert.Equal(t, new(decimal.Big).SetInf(false), k.Calculate(1))
 }

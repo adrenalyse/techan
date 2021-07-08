@@ -2,19 +2,18 @@ package techan
 
 import (
 	"fmt"
+	"github.com/ericlagergren/decimal"
 	"strings"
-
-	"github.com/sdcoffey/big"
 )
 
 // Candle represents basic market information for a security over a given time period
 type Candle struct {
 	Period     TimePeriod
-	OpenPrice  big.Decimal
-	ClosePrice big.Decimal
-	MaxPrice   big.Decimal
-	MinPrice   big.Decimal
-	Volume     big.Decimal
+	OpenPrice  *decimal.Big
+	ClosePrice *decimal.Big
+	MaxPrice   *decimal.Big
+	MinPrice   *decimal.Big
+	Volume     *decimal.Big
 	TradeCount uint
 }
 
@@ -22,38 +21,38 @@ type Candle struct {
 func NewCandle(period TimePeriod) (c *Candle) {
 	return &Candle{
 		Period:     period,
-		OpenPrice:  big.ZERO,
-		ClosePrice: big.ZERO,
-		MaxPrice:   big.ZERO,
-		MinPrice:   big.ZERO,
-		Volume:     big.ZERO,
+		OpenPrice:  &decimal.Big{},
+		ClosePrice: &decimal.Big{},
+		MaxPrice:   &decimal.Big{},
+		MinPrice:   &decimal.Big{},
+		Volume:     &decimal.Big{},
 	}
 }
 
 // AddTrade adds a trade to this candle. It will determine if the current price is higher or lower than the min or max
 // price and increment the tradecount.
-func (c *Candle) AddTrade(tradeAmount, tradePrice big.Decimal) {
-	if c.OpenPrice.Zero() {
+func (c *Candle) AddTrade(tradeAmount, tradePrice *decimal.Big) {
+	if c.OpenPrice.Sign() == 0 {
 		c.OpenPrice = tradePrice
 	}
 	c.ClosePrice = tradePrice
 
-	if c.MaxPrice.Zero() {
+	if c.MaxPrice.Sign() == 0 {
 		c.MaxPrice = tradePrice
-	} else if tradePrice.GT(c.MaxPrice) {
+	} else if tradePrice.Cmp(c.MaxPrice) == 1 {
 		c.MaxPrice = tradePrice
 	}
 
-	if c.MinPrice.Zero() {
+	if c.MinPrice.Sign() == 0 {
 		c.MinPrice = tradePrice
-	} else if tradePrice.LT(c.MinPrice) {
+	} else if tradePrice.Cmp(c.MinPrice) == -1 {
 		c.MinPrice = tradePrice
 	}
 
-	if c.Volume.Zero() {
+	if c.Volume.Sign() == 0 {
 		c.Volume = tradeAmount
 	} else {
-		c.Volume = c.Volume.Add(tradeAmount)
+		c.Volume = c.Volume.Add(c.Volume, tradeAmount)
 	}
 
 	c.TradeCount++
@@ -70,10 +69,10 @@ Low:	%s
 Volume:	%s
 	`,
 		c.Period,
-		c.OpenPrice.FormattedString(2),
-		c.ClosePrice.FormattedString(2),
-		c.MaxPrice.FormattedString(2),
-		c.MinPrice.FormattedString(2),
-		c.Volume.FormattedString(2),
+		c.OpenPrice.String(),
+		c.ClosePrice.String(),
+		c.MaxPrice.String(),
+		c.MinPrice.String(),
+		c.Volume.String(),
 	))
 }

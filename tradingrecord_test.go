@@ -1,10 +1,10 @@
 package techan
 
 import (
+	"github.com/ericlagergren/decimal"
 	"testing"
 	"time"
 
-	"github.com/sdcoffey/big"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -21,8 +21,8 @@ func TestTradingRecord_CurrentTrade(t *testing.T) {
 	yesterday := time.Now().Add(-time.Hour * 24)
 	record.Operate(Order{
 		Side:          BUY,
-		Amount:        big.ONE,
-		Price:         big.NewFromString("2"),
+		Amount:        decimal.New(1, 0),
+		Price:         decimal.New(2, 0),
 		ExecutionTime: yesterday,
 	})
 
@@ -34,8 +34,8 @@ func TestTradingRecord_CurrentTrade(t *testing.T) {
 	now := time.Now()
 	record.Operate(Order{
 		Side:          SELL,
-		Amount:        big.NewFromString("3"),
-		Price:         big.NewFromString("4"),
+		Amount:        decimal.New(3, 0),
+		Price:         decimal.New(4, 0),
 		ExecutionTime: now,
 	})
 	assert.True(t, record.CurrentPosition().IsNew())
@@ -56,22 +56,22 @@ func TestTradingRecord_Enter(t *testing.T) {
 
 		record.Operate(Order{
 			Side:          BUY,
-			Amount:        big.ONE,
-			Price:         big.NewFromString("2"),
+			Amount:        decimal.New(1, 0),
+			Price:         decimal.New(2, 0),
 			ExecutionTime: now,
 		})
 
 		record.Operate(Order{
 			Side:          SELL,
-			Amount:        big.NewFromString("2"),
-			Price:         big.NewFromString("2"),
+			Amount:        decimal.New(2, 0),
+			Price:         decimal.New(2, 0),
 			ExecutionTime: now.Add(time.Minute),
 		})
 
 		record.Operate(Order{
 			Side:          BUY,
-			Amount:        big.NewFromString("2"),
-			Price:         big.NewFromString("2"),
+			Amount:        decimal.New(2, 0),
+			Price:         decimal.New(2, 0),
 			ExecutionTime: now.Add(-time.Minute),
 		})
 
@@ -88,15 +88,15 @@ func TestTradingRecord_Exit(t *testing.T) {
 		record.Operate(Order{
 
 			Side:          BUY,
-			Amount:        big.ONE,
-			Price:         big.NewFromString("2"),
+			Amount:        decimal.New(1, 0),
+			Price:         decimal.New(2, 0),
 			ExecutionTime: now,
 		})
 
 		record.Operate(Order{
 			Side:          SELL,
-			Amount:        big.NewFromString("2"),
-			Price:         big.NewFromString("2"),
+			Amount:        decimal.New(2, 0),
+			Price:         decimal.New(2, 0),
 			ExecutionTime: now.Add(-time.Minute),
 		})
 

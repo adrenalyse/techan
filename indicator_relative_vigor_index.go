@@ -1,6 +1,8 @@
 package techan
 
-import "github.com/sdcoffey/big"
+import (
+	"github.com/ericlagergren/decimal"
+)
 
 type relativeVigorIndexIndicator struct {
 	numerator   Indicator
@@ -18,28 +20,32 @@ func NewRelativeVigorIndexIndicator(series *TimeSeries) Indicator {
 	}
 }
 
-func (rvii relativeVigorIndexIndicator) Calculate(index int) big.Decimal {
+func (rvii relativeVigorIndexIndicator) Calculate(index int) *decimal.Big {
 	if index < 3 {
-		return big.ZERO
+		return &decimal.Big{}
 	}
 
-	two := big.NewFromString("2")
+	two := decimal.New(2, 0)
 
 	a := rvii.numerator.Calculate(index)
-	b := rvii.numerator.Calculate(index - 1).Mul(two)
-	c := rvii.numerator.Calculate(index - 2).Mul(two)
+	tmp1 := rvii.numerator.Calculate(index - 1)
+	b := tmp1.Mul(tmp1, two)
+	tmp2 := rvii.numerator.Calculate(index - 2)
+	c := tmp2.Mul(tmp2, two)
 	d := rvii.numerator.Calculate(index - 3)
 
-	num := (a.Add(b).Add(c).Add(d)).Div(big.NewFromString("6"))
+	num := a.Quo(a.Add(a, b.Add(b, c.Add(c, d))), decimal.New(6, 0))
 
 	e := rvii.denominator.Calculate(index)
-	f := rvii.denominator.Calculate(index - 1).Mul(two)
-	g := rvii.denominator.Calculate(index - 2).Mul(two)
+	tmp1 = rvii.denominator.Calculate(index - 1)
+	f := tmp1.Mul(tmp1, two)
+	tmp2 = rvii.denominator.Calculate(index - 2)
+	g := tmp2.Mul(tmp2, two)
 	h := rvii.denominator.Calculate(index - 3)
 
-	denom := (e.Add(f).Add(g).Add(h)).Div(big.NewFromString("6"))
+	denom := e.Quo(e.Add(e, f.Add(f, g.Add(g, h))), decimal.New(6, 0))
 
-	return num.Div(denom)
+	return num.Quo(num, denom)
 }
 
 type relativeVigorIndexSignalLine struct {
@@ -54,15 +60,17 @@ func NewRelativeVigorSignalLine(series *TimeSeries) Indicator {
 	}
 }
 
-func (rvsn relativeVigorIndexSignalLine) Calculate(index int) big.Decimal {
+func (rvsn relativeVigorIndexSignalLine) Calculate(index int) *decimal.Big {
 	if index < 3 {
-		return big.ZERO
+		return &decimal.Big{}
 	}
 
 	rvi := rvsn.relativeVigorIndex.Calculate(index)
-	i := rvsn.relativeVigorIndex.Calculate(index - 1).Mul(big.NewFromString("2"))
-	j := rvsn.relativeVigorIndex.Calculate(index - 2).Mul(big.NewFromString("2"))
+	tmp := rvsn.relativeVigorIndex.Calculate(index - 1)
+	i := tmp.Mul(rvsn.relativeVigorIndex.Calculate(index-1), decimal.New(2, 0))
+	tmp1 := rvsn.relativeVigorIndex.Calculate(index - 2)
+	j := tmp1.Mul(tmp1, decimal.New(2, 0))
 	k := rvsn.relativeVigorIndex.Calculate(index - 3)
 
-	return (rvi.Add(i).Add(j).Add(k)).Div(big.NewFromString("6"))
+	return rvi.Quo(rvi.Add(rvi, i.Add(i, j.Add(j, k))), decimal.New(6, 0))
 }

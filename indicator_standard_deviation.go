@@ -1,7 +1,8 @@
 package techan
 
 import (
-	"github.com/sdcoffey/big"
+	"github.com/ericlagergren/decimal"
+	"github.com/ericlagergren/decimal/math"
 )
 
 // NewStandardDeviationIndicator calculates the standard deviation of a base indicator.
@@ -17,6 +18,7 @@ type standardDeviationIndicator struct {
 }
 
 // Calculate returns the standard deviation of a base indicator
-func (sdi standardDeviationIndicator) Calculate(index int) big.Decimal {
-	return sdi.indicator.Calculate(index).Sqrt()
+func (sdi standardDeviationIndicator) Calculate(index int) *decimal.Big {
+	tmp := sdi.indicator.Calculate(index)
+	return math.Sqrt(tmp, tmp)
 }

@@ -1,6 +1,8 @@
 package techan
 
-import "github.com/sdcoffey/big"
+import (
+	"github.com/ericlagergren/decimal"
+)
 
 type commidityChannelIndexIndicator struct {
 	series *TimeSeries
@@ -16,10 +18,16 @@ func NewCCIIndicator(ts *TimeSeries, window int) Indicator {
 	}
 }
 
-func (ccii commidityChannelIndexIndicator) Calculate(index int) big.Decimal {
+func (ccii commidityChannelIndexIndicator) Calculate(index int) *decimal.Big {
 	typicalPrice := NewTypicalPriceIndicator(ccii.series)
 	typicalPriceSma := NewSimpleMovingAverage(typicalPrice, ccii.window)
 	meanDeviation := NewMeanDeviationIndicator(NewClosePriceIndicator(ccii.series), ccii.window)
 
-	return typicalPrice.Calculate(index).Sub(typicalPriceSma.Calculate(index)).Div(meanDeviation.Calculate(index).Mul(big.NewFromString("0.015")))
+	// (typicalPrice.Calculate(index) - typicalPriceSma.Calculate(index)) / (meanDeviation.Calculate(index) * 0.015)
+	tmp := typicalPrice.Calculate(index)
+	tmp1 := typicalPriceSma.Calculate(index)
+	tmp.Sub(tmp, tmp1) // tmp used
+	tmp1.Mul(meanDeviation.Calculate(index), tmp1.SetFloat64(0.015))
+
+	return tmp1.Quo(tmp, tmp1)
 }

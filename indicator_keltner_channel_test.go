@@ -17,10 +17,10 @@ func TestKeltnerChannel(t *testing.T) {
 			67.46,
 			67.685,
 			67.7675,
-			67.3588,
-			67.3644,
-			67.0405,
-			66.6219,
+			67.35875,
+			67.364375,
+			67.04052083333333,
+			66.62192708333333,
 		}
 
 		indicatorEquals(t, expectedValues, upper)
@@ -38,10 +38,10 @@ func TestKeltnerChannel(t *testing.T) {
 			59.46,
 			59.685,
 			59.7675,
-			59.3588,
-			59.3644,
-			57.6539,
-			57.2353,
+			59.35875,
+			59.364375,
+			57.65385416666667,
+			57.23526041666667,
 		}
 
 		indicatorEquals(t, expectedValues, lower)

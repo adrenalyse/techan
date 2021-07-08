@@ -37,6 +37,8 @@ func TestCumulativeGainsIndicator(t *testing.T) {
 		cumGains := NewCumulativeGainsIndicator(NewClosePriceIndicator(ts), 6)
 
 		decimalEquals(t, 0, cumGains.Calculate(0))
+		decimalEquals(t, 0, cumGains.Calculate(0))
+		decimalEquals(t, 0, cumGains.Calculate(0))
 		decimalEquals(t, 1, cumGains.Calculate(1))
 		decimalEquals(t, 2, cumGains.Calculate(2))
 		decimalEquals(t, 4, cumGains.Calculate(3))
@@ -49,6 +51,7 @@ func TestCumulativeGainsIndicator(t *testing.T) {
 
 		cumGains := NewCumulativeGainsIndicator(NewClosePriceIndicator(ts), 6)
 
+		decimalEquals(t, 0, cumGains.Calculate(0))
 		decimalEquals(t, 0, cumGains.Calculate(0))
 		decimalEquals(t, 5, cumGains.Calculate(1))
 		decimalEquals(t, 5, cumGains.Calculate(2))

@@ -1,6 +1,8 @@
 package techan
 
-import "github.com/sdcoffey/big"
+import (
+	"github.com/ericlagergren/decimal"
+)
 
 type modifiedMovingAverageIndicator struct {
 	indicator   Indicator
@@ -8,31 +10,33 @@ type modifiedMovingAverageIndicator struct {
 	resultCache resultCache
 }
 
-// NewMMAIndicator returns a derivative indciator which returns the modified moving average of the underlying
-// indictator. An in-depth explanation can be found here:
+// NewMMAIndicator returns a derivative indicator which returns the modified moving average of the underlying
+// indicator. An in-depth explanation can be found here:
 // https://en.wikipedia.org/wiki/Moving_average#Modified_moving_average
 func NewMMAIndicator(indicator Indicator, window int) Indicator {
 	return &modifiedMovingAverageIndicator{
 		indicator:   indicator,
 		window:      window,
-		resultCache: make([]*big.Decimal, 10000),
+		resultCache: make([]*decimal.Big, 10000),
 	}
 }
 
-func (mma *modifiedMovingAverageIndicator) Calculate(index int) big.Decimal {
-	if cachedValue := returnIfCached(mma, index, func(i int) big.Decimal {
+func (mma *modifiedMovingAverageIndicator) Calculate(index int) *decimal.Big {
+	if cachedValue := returnIfCached(mma, index, func(i int) *decimal.Big {
 		return NewSimpleMovingAverage(mma.indicator, mma.window).Calculate(i)
 	}); cachedValue != nil {
-		return *cachedValue
+		return cachedValue
 	}
 
 	todayVal := mma.indicator.Calculate(index)
 	lastVal := mma.Calculate(index - 1)
 
-	result := lastVal.Add(big.NewDecimal(1.0 / float64(mma.window)).Mul(todayVal.Sub(lastVal)))
-	cacheResult(mma, index, result)
+	// lastVal + (big.NewDecimal(1.0 / float64(mma.window)) * todayVal.Sub(lastVal)
+	tmp := new(decimal.Big).SetFloat64(1.0 / float64(mma.window))
+	tmp.FMA(tmp, todayVal.Sub(todayVal, lastVal), lastVal)
+	cacheResult(mma, index, new(decimal.Big).Copy(tmp))
 
-	return result
+	return tmp
 }
 
 func (mma modifiedMovingAverageIndicator) cache() resultCache {

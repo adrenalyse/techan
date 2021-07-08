@@ -1,38 +1,40 @@
 package techan
 
 import (
+	"github.com/ericlagergren/decimal"
 	"math"
-
-	"github.com/sdcoffey/big"
 )
 
 type aroonIndicator struct {
 	indicator Indicator
 	window    int
-	direction big.Decimal
+	direction decimal.Big
 	lowIndex  int
 }
 
-func (ai *aroonIndicator) Calculate(index int) big.Decimal {
+func (ai *aroonIndicator) Calculate(index int) *decimal.Big {
 	if index < ai.window-1 {
-		return big.ZERO
+		return &decimal.Big{}
 	}
 
-	oneHundred := big.TEN.Mul(big.TEN)
+	oneHundred := decimal.New(100, 0)
 	ai.lowIndex = ai.findLowIndex(index)
-	pSince := big.NewDecimal(float64(index - ai.lowIndex))
-	windowAsDecimal := big.NewDecimal(float64(ai.window))
+	// pSince
+	tmp1 := new(decimal.Big).SetFloat64(float64(index - ai.lowIndex))
+	// windowAsDecimal
+	tmp2 := new(decimal.Big).SetFloat64(float64(ai.window))
 
-	return windowAsDecimal.Sub(pSince).Div(windowAsDecimal).Mul(oneHundred)
+	return tmp2.Mul(tmp1.Quo(tmp1.Sub(tmp2, tmp1), tmp2), oneHundred)
 }
 
 func (ai aroonIndicator) findLowIndex(index int) int {
 	if ai.lowIndex < 1 || ai.lowIndex < index-ai.window {
-		lv := big.NewDecimal(math.MaxFloat64)
+		lv := new(decimal.Big).SetFloat64(math.MaxFloat64)
 		lowIndex := -1
 		for i := (index + 1) - ai.window; i <= index; i++ {
-			value := ai.indicator.Calculate(i).Mul(ai.direction)
-			if value.LT(lv) {
+			tmp := ai.indicator.Calculate(i)
+			value := tmp.Mul(tmp, &ai.direction)
+			if value.Cmp(lv) == -1 {
 				lv = value
 				lowIndex = i
 			}
@@ -41,10 +43,12 @@ func (ai aroonIndicator) findLowIndex(index int) int {
 		return lowIndex
 	}
 
-	v1 := ai.indicator.Calculate(index).Mul(ai.direction)
-	v2 := ai.indicator.Calculate(ai.lowIndex).Mul(ai.direction)
+	tmp1 := ai.indicator.Calculate(index)
+	v1 := tmp1.Mul(tmp1, &ai.direction)
+	tmp2 := ai.indicator.Calculate(ai.lowIndex)
+	v2 := tmp2.Mul(tmp2, &ai.direction)
 
-	if v1.LT(v2) {
+	if v1.Cmp(v2) == -1 {
 		return index
 	}
 
@@ -60,7 +64,7 @@ func NewAroonUpIndicator(indicator Indicator, window int) Indicator {
 	return &aroonIndicator{
 		indicator: indicator,
 		window:    window,
-		direction: big.ONE.Neg(),
+		direction: *decimal.New(-1, 0),
 		lowIndex:  -1,
 	}
 }
@@ -74,7 +78,7 @@ func NewAroonDownIndicator(indicator Indicator, window int) Indicator {
 	return &aroonIndicator{
 		indicator: indicator,
 		window:    window,
-		direction: big.ONE,
+		direction: *decimal.New(1, 0),
 		lowIndex:  -1,
 	}
 }

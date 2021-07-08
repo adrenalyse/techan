@@ -1,13 +1,13 @@
 package techan
 
 import (
-	"github.com/sdcoffey/big"
+	"github.com/ericlagergren/decimal"
 )
 
 type keltnerChannelIndicator struct {
 	ema    Indicator
 	atr    Indicator
-	mul    big.Decimal
+	mul    decimal.Big
 	window int
 }
 
@@ -15,7 +15,7 @@ func NewKeltnerChannelUpperIndicator(series *TimeSeries, window int) Indicator {
 	return keltnerChannelIndicator{
 		atr:    NewAverageTrueRangeIndicator(series, window),
 		ema:    NewEMAIndicator(NewClosePriceIndicator(series), window),
-		mul:    big.ONE,
+		mul:    *decimal.New(1, 0),
 		window: window,
 	}
 }
@@ -24,17 +24,20 @@ func NewKeltnerChannelLowerIndicator(series *TimeSeries, window int) Indicator {
 	return keltnerChannelIndicator{
 		atr:    NewAverageTrueRangeIndicator(series, window),
 		ema:    NewEMAIndicator(NewClosePriceIndicator(series), window),
-		mul:    big.ONE.Neg(),
+		mul:    *decimal.New(-1, 0),
 		window: window,
 	}
 }
 
-func (kci keltnerChannelIndicator) Calculate(index int) big.Decimal {
+func (kci keltnerChannelIndicator) Calculate(index int) *decimal.Big {
 	if index <= kci.window-1 {
-		return big.ZERO
+		return &decimal.Big{}
 	}
 
-	coefficient := big.NewFromInt(2).Mul(kci.mul)
+	coefficient := decimal.New(2, 0)
+	coefficient.Mul(coefficient, &kci.mul)
 
-	return kci.ema.Calculate(index).Add(kci.atr.Calculate(index).Mul(coefficient))
+	tmp := kci.ema.Calculate(index)
+
+	return new(decimal.Big).Add(tmp, coefficient.Mul(kci.atr.Calculate(index), coefficient))
 }

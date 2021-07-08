@@ -20,10 +20,10 @@ func TestCommidityChannelIndexIndicator_Calculate(t *testing.T) {
 
 	cci := NewCCIIndicator(series, 20)
 
-	results := []string{"101.9185", "31.1946", "6.5578", "33.6078", "34.9686", "13.6027",
-		"-10.6789", "-11.4710", "-29.2567", "-128.6000", "-72.7273"}
+	results := []string{"101.9184652278177", "31.19461183977313", "6.557771560930121", "33.60780725831046", "34.96855345911950", "13.60267993097147",
+		"-10.67887109077040", "-11.47098515519568", "-29.25666070527812", "-128.6000174018968", "-72.72727272727273"}
 
 	for i, result := range results {
-		assert.EqualValues(t, result, cci.Calculate(i+19).FormattedString(4))
+		assert.EqualValues(t, result, cci.Calculate(i+19).String())
 	}
 }

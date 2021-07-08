@@ -1,10 +1,12 @@
 package techan
 
-import "github.com/sdcoffey/big"
+import (
+	"github.com/ericlagergren/decimal"
+)
 
 type gainLossIndicator struct {
 	Indicator
-	coefficient big.Decimal
+	coefficient decimal.Big
 }
 
 // NewGainIndicator returns a derivative indicator that returns the gains in the underlying indicator in the last bar,
@@ -12,7 +14,7 @@ type gainLossIndicator struct {
 func NewGainIndicator(indicator Indicator) Indicator {
 	return gainLossIndicator{
 		Indicator:   indicator,
-		coefficient: big.ONE,
+		coefficient: *decimal.New(1, 0),
 	}
 }
 
@@ -21,27 +23,30 @@ func NewGainIndicator(indicator Indicator) Indicator {
 func NewLossIndicator(indicator Indicator) Indicator {
 	return gainLossIndicator{
 		Indicator:   indicator,
-		coefficient: big.ONE.Neg(),
+		coefficient: *decimal.New(-1, 0),
 	}
 }
 
-func (gli gainLossIndicator) Calculate(index int) big.Decimal {
+func (gli gainLossIndicator) Calculate(index int) *decimal.Big {
 	if index == 0 {
-		return big.ZERO
+		return &decimal.Big{}
 	}
 
-	delta := gli.Indicator.Calculate(index).Sub(gli.Indicator.Calculate(index - 1)).Mul(gli.coefficient)
-	if delta.GT(big.ZERO) {
+	tmp := gli.Indicator.Calculate(index)
+	tmp1 := tmp.Sub(tmp, gli.Indicator.Calculate(index-1))
+
+	delta := tmp1.Mul(tmp1, &gli.coefficient)
+	if delta.Cmp(&decimal.Big{}) == 1 {
 		return delta
 	}
 
-	return big.ZERO
+	return &decimal.Big{}
 }
 
 type cumulativeIndicator struct {
 	Indicator
 	window int
-	mult   big.Decimal
+	mult   decimal.Big
 }
 
 // NewCumulativeGainsIndicator returns a derivative indicator which returns all gains made in a base indicator for a given
@@ -50,7 +55,7 @@ func NewCumulativeGainsIndicator(indicator Indicator, window int) Indicator {
 	return cumulativeIndicator{
 		Indicator: indicator,
 		window:    window,
-		mult:      big.ONE,
+		mult:      *decimal.New(1, 0),
 	}
 }
 
@@ -60,17 +65,17 @@ func NewCumulativeLossesIndicator(indicator Indicator, window int) Indicator {
 	return cumulativeIndicator{
 		Indicator: indicator,
 		window:    window,
-		mult:      big.ONE.Neg(),
+		mult:      *decimal.New(-1, 0),
 	}
 }
 
-func (ci cumulativeIndicator) Calculate(index int) big.Decimal {
-	total := big.NewDecimal(0.0)
-
+func (ci cumulativeIndicator) Calculate(index int) *decimal.Big {
+	total := &decimal.Big{}
+	tmp := &decimal.Big{}
 	for i := Max(1, index-(ci.window-1)); i <= index; i++ {
-		diff := ci.Indicator.Calculate(i).Sub(ci.Indicator.Calculate(i - 1))
-		if diff.Mul(ci.mult).GT(big.ZERO) {
-			total = total.Add(diff.Abs())
+		diff := tmp.Sub(ci.Indicator.Calculate(i), ci.Indicator.Calculate(i-1))
+		if diff.Mul(diff, &ci.mult).Cmp(&decimal.Big{}) == 1 {
+			total.Add(total, diff.Abs(diff))
 		}
 	}
 
@@ -87,12 +92,13 @@ func NewPercentChangeIndicator(indicator Indicator) Indicator {
 	return percentChangeIndicator{indicator}
 }
 
-func (pgi percentChangeIndicator) Calculate(index int) big.Decimal {
+func (pgi percentChangeIndicator) Calculate(index int) *decimal.Big {
 	if index == 0 {
-		return big.ZERO
+		return &decimal.Big{}
 	}
 
 	cp := pgi.Indicator.Calculate(index)
 	cplast := pgi.Indicator.Calculate(index - 1)
-	return cp.Div(cplast).Sub(big.ONE)
+	tmp := cp.Quo(cp, cplast)
+	return tmp.Sub(tmp, decimal.New(1, 0))
 }
