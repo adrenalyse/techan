@@ -1,4 +1,4 @@
-module github.com/adrenalyse/techan
+module github.com/adrenalyse/techan/v1
 
 go 1.16
 
