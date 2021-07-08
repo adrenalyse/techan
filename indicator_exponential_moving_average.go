@@ -24,21 +24,21 @@ func NewEMAIndicator(indicator Indicator, window int) Indicator {
 	}
 }
 
-func (ema *emaIndicator) Calculate(index int) *decimal.Big {
-	if cachedValue := returnIfCached(ema, index, func(i int) *decimal.Big {
+func (ema *emaIndicator) Calculate(index int) decimal.Big {
+	if cachedValue := returnIfCached(ema, index, func(i int) decimal.Big {
 		return NewSimpleMovingAverage(ema.indicator, ema.window).Calculate(i)
 	}); cachedValue != nil {
-		return cachedValue
+		return *cachedValue
 	}
 
 	tmp := ema.indicator.Calculate(index)
-	todayVal := tmp.Mul(tmp, &ema.alpha)
+	todayVal := tmp.Mul(&tmp, &ema.alpha)
 	tmp1 := ema.Calculate(index - 1)
-	result := todayVal.Add(todayVal, tmp1.Mul(tmp1, &ema.alpha))
+	result := new(decimal.Big).Add(todayVal, tmp1.Mul(&tmp1, &ema.alpha))
 
-	cacheResult(ema, index, new(decimal.Big).Copy(result))
+	cacheResult(ema, index, *result)
 
-	return result
+	return *result
 }
 
 func (ema emaIndicator) cache() resultCache { return ema.resultCache }

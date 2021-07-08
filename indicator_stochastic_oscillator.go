@@ -23,16 +23,16 @@ func NewFastStochasticIndicator(series *TimeSeries, timeframe int) Indicator {
 	}
 }
 
-func (k kIndicator) Calculate(index int) *decimal.Big {
+func (k kIndicator) Calculate(index int) decimal.Big {
 	closeVal := k.closePrice.Calculate(index)
 	minVal := k.minValue.Calculate(index)
 	maxVal := k.maxValue.Calculate(index)
 
-	if minVal.Cmp(maxVal) == 0 {
-		return new(decimal.Big).SetInf(false)
+	if minVal.Cmp(&maxVal) == 0 {
+		return *new(decimal.Big).SetInf(false)
 	}
-
-	return closeVal.Mul(maxVal.Quo(closeVal.Sub(closeVal, minVal), maxVal.Sub(maxVal, minVal)), decimal.New(100, 0))
+	r := decimal.New(100, 0)
+	return *r.Mul(maxVal.Quo(closeVal.Sub(&closeVal, &minVal), maxVal.Sub(&maxVal, &minVal)), r)
 }
 
 type dIndicator struct {
@@ -47,6 +47,6 @@ func NewSlowStochasticIndicator(k Indicator, window int) Indicator {
 	return dIndicator{k, window}
 }
 
-func (d dIndicator) Calculate(index int) *decimal.Big {
+func (d dIndicator) Calculate(index int) decimal.Big {
 	return NewSimpleMovingAverage(d.k, d.window).Calculate(index)
 }

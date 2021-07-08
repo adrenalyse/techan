@@ -19,17 +19,18 @@ func NewAverageTrueRangeIndicator(series *TimeSeries, window int) Indicator {
 	}
 }
 
-func (atr averageTrueRangeIndicator) Calculate(index int) *decimal.Big {
+func (atr averageTrueRangeIndicator) Calculate(index int) decimal.Big {
 	if index < atr.window {
-		return &decimal.Big{}
+		return decimal.Big{}
 	}
 
 	sum := &decimal.Big{}
 	indicator := NewTrueRangeIndicator(atr.series)
 
 	for i := index; i > index-atr.window; i-- {
-		sum.Add(sum, indicator.Calculate(i))
+		c := indicator.Calculate(i)
+		sum.Add(sum, &c)
 	}
 
-	return sum.Quo(sum, decimal.New(int64(atr.window), 0))
+	return *sum.Quo(sum, decimal.New(int64(atr.window), 0))
 }

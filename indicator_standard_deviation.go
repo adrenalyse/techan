@@ -18,7 +18,7 @@ type standardDeviationIndicator struct {
 }
 
 // Calculate returns the standard deviation of a base indicator
-func (sdi standardDeviationIndicator) Calculate(index int) *decimal.Big {
+func (sdi standardDeviationIndicator) Calculate(index int) decimal.Big {
 	tmp := sdi.indicator.Calculate(index)
-	return math.Sqrt(tmp, tmp)
+	return *math.Sqrt(&tmp, &tmp)
 }

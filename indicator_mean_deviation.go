@@ -20,9 +20,9 @@ func NewMeanDeviationIndicator(indicator Indicator, window int) Indicator {
 	}
 }
 
-func (mdi meanDeviationIndicator) Calculate(index int) *decimal.Big {
+func (mdi meanDeviationIndicator) Calculate(index int) decimal.Big {
 	if index < mdi.window-1 {
-		return &decimal.Big{}
+		return decimal.Big{}
 	}
 
 	average := mdi.movingAverage.Calculate(index)
@@ -31,8 +31,8 @@ func (mdi meanDeviationIndicator) Calculate(index int) *decimal.Big {
 
 	for i := start; i <= index; i++ {
 		tmp := mdi.Indicator.Calculate(i)
-		absoluteDeviations.Add(absoluteDeviations, tmp.Abs(tmp.Sub(average, tmp)))
+		absoluteDeviations.Add(absoluteDeviations, tmp.Abs(tmp.Sub(&average, &tmp)))
 	}
 
-	return absoluteDeviations.Quo(absoluteDeviations, average.SetFloat64(float64(Min(mdi.window, index-start+1))))
+	return *absoluteDeviations.Quo(absoluteDeviations, average.SetFloat64(float64(Min(mdi.window, index-start+1))))
 }

@@ -20,7 +20,7 @@ func TestTimeSeries_AddCandle(t *testing.T) {
 		ts := NewTimeSeries()
 
 		candle := NewCandle(NewTimePeriod(time.Now(), time.Minute))
-		candle.ClosePrice = decimal.New(1, 0)
+		candle.ClosePrice = *decimal.New(1, 0)
 
 		ts.AddCandle(candle)
 
@@ -32,13 +32,13 @@ func TestTimeSeries_AddCandle(t *testing.T) {
 
 		now := time.Now()
 		candle := NewCandle(NewTimePeriod(now, time.Minute))
-		candle.ClosePrice = decimal.New(1, 0)
+		candle.ClosePrice = *decimal.New(1, 0)
 
 		ts.AddCandle(candle)
 		then := now.Add(-time.Minute * 10)
 
 		nextCandle := NewCandle(NewTimePeriod(then, time.Minute))
-		candle.ClosePrice = decimal.New(2, 0)
+		candle.ClosePrice = *decimal.New(2, 0)
 
 		ts.AddCandle(nextCandle)
 
@@ -52,7 +52,7 @@ func TestTimeSeries_LastCandle(t *testing.T) {
 
 	now := time.Now()
 	candle := NewCandle(NewTimePeriod(now, time.Minute))
-	candle.ClosePrice = decimal.New(1, 0)
+	candle.ClosePrice = *decimal.New(1, 0)
 
 	ts.AddCandle(candle)
 
@@ -62,7 +62,7 @@ func TestTimeSeries_LastCandle(t *testing.T) {
 
 	next := time.Now().Add(time.Minute)
 	newCandle := NewCandle(NewTimePeriod(next, time.Minute))
-	newCandle.ClosePrice = decimal.New(2, 0)
+	newCandle.ClosePrice = *decimal.New(2, 0)
 
 	ts.AddCandle(newCandle)
 

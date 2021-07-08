@@ -22,10 +22,10 @@ type maximumDrawdownIndicator struct {
 	window    int
 }
 
-func (mdi maximumDrawdownIndicator) Calculate(index int) *decimal.Big {
+func (mdi maximumDrawdownIndicator) Calculate(index int) decimal.Big {
 	minVal := NewMinimumValueIndicator(mdi.indicator, mdi.window).Calculate(index)
 	maxVal := NewMaximumValueIndicator(mdi.indicator, mdi.window).Calculate(index)
 
-	tmp := minVal.Sub(minVal, maxVal)
-	return tmp.Quo(tmp, maxVal)
+	tmp := new(decimal.Big).Sub(&minVal, &maxVal)
+	return *tmp.Quo(tmp, &maxVal)
 }

@@ -9,11 +9,11 @@ import (
 // Candle represents basic market information for a security over a given time period
 type Candle struct {
 	Period     TimePeriod
-	OpenPrice  *decimal.Big
-	ClosePrice *decimal.Big
-	MaxPrice   *decimal.Big
-	MinPrice   *decimal.Big
-	Volume     *decimal.Big
+	OpenPrice  decimal.Big
+	ClosePrice decimal.Big
+	MaxPrice   decimal.Big
+	MinPrice   decimal.Big
+	Volume     decimal.Big
 	TradeCount uint
 }
 
@@ -21,17 +21,17 @@ type Candle struct {
 func NewCandle(period TimePeriod) (c *Candle) {
 	return &Candle{
 		Period:     period,
-		OpenPrice:  &decimal.Big{},
-		ClosePrice: &decimal.Big{},
-		MaxPrice:   &decimal.Big{},
-		MinPrice:   &decimal.Big{},
-		Volume:     &decimal.Big{},
+		OpenPrice:  decimal.Big{},
+		ClosePrice: decimal.Big{},
+		MaxPrice:   decimal.Big{},
+		MinPrice:   decimal.Big{},
+		Volume:     decimal.Big{},
 	}
 }
 
 // AddTrade adds a trade to this candle. It will determine if the current price is higher or lower than the min or max
 // price and increment the tradecount.
-func (c *Candle) AddTrade(tradeAmount, tradePrice *decimal.Big) {
+func (c *Candle) AddTrade(tradeAmount, tradePrice decimal.Big) {
 	if c.OpenPrice.Sign() == 0 {
 		c.OpenPrice = tradePrice
 	}
@@ -39,20 +39,20 @@ func (c *Candle) AddTrade(tradeAmount, tradePrice *decimal.Big) {
 
 	if c.MaxPrice.Sign() == 0 {
 		c.MaxPrice = tradePrice
-	} else if tradePrice.Cmp(c.MaxPrice) == 1 {
+	} else if tradePrice.Cmp(&c.MaxPrice) == 1 {
 		c.MaxPrice = tradePrice
 	}
 
 	if c.MinPrice.Sign() == 0 {
 		c.MinPrice = tradePrice
-	} else if tradePrice.Cmp(c.MinPrice) == -1 {
+	} else if tradePrice.Cmp(&c.MinPrice) == -1 {
 		c.MinPrice = tradePrice
 	}
 
 	if c.Volume.Sign() == 0 {
 		c.Volume = tradeAmount
 	} else {
-		c.Volume = c.Volume.Add(c.Volume, tradeAmount)
+		c.Volume = *c.Volume.Add(&c.Volume, &tradeAmount)
 	}
 
 	c.TradeCount++

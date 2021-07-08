@@ -19,7 +19,7 @@ type minimumValueIndicator struct {
 	window    int
 }
 
-func (mvi minimumValueIndicator) Calculate(index int) *decimal.Big {
+func (mvi minimumValueIndicator) Calculate(index int) decimal.Big {
 	minValue := new(decimal.Big).SetInf(false)
 
 	start := 0
@@ -30,9 +30,9 @@ func (mvi minimumValueIndicator) Calculate(index int) *decimal.Big {
 	for i := start; i <= index; i++ {
 		value := mvi.indicator.Calculate(i)
 		if value.Cmp(minValue) == -1 {
-			minValue = value
+			minValue = &value
 		}
 	}
 
-	return minValue
+	return *minValue
 }

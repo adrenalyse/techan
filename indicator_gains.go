@@ -27,20 +27,21 @@ func NewLossIndicator(indicator Indicator) Indicator {
 	}
 }
 
-func (gli gainLossIndicator) Calculate(index int) *decimal.Big {
+func (gli gainLossIndicator) Calculate(index int) decimal.Big {
 	if index == 0 {
-		return &decimal.Big{}
+		return decimal.Big{}
 	}
 
 	tmp := gli.Indicator.Calculate(index)
-	tmp1 := tmp.Sub(tmp, gli.Indicator.Calculate(index-1))
+	tmp1 := gli.Indicator.Calculate(index - 1)
+	tmp.Sub(&tmp, &tmp1)
 
-	delta := tmp1.Mul(tmp1, &gli.coefficient)
+	delta := tmp1.Mul(&tmp, &gli.coefficient)
 	if delta.Cmp(&decimal.Big{}) == 1 {
-		return delta
+		return *delta
 	}
 
-	return &decimal.Big{}
+	return decimal.Big{}
 }
 
 type cumulativeIndicator struct {
@@ -69,17 +70,19 @@ func NewCumulativeLossesIndicator(indicator Indicator, window int) Indicator {
 	}
 }
 
-func (ci cumulativeIndicator) Calculate(index int) *decimal.Big {
+func (ci cumulativeIndicator) Calculate(index int) decimal.Big {
 	total := &decimal.Big{}
 	tmp := &decimal.Big{}
 	for i := Max(1, index-(ci.window-1)); i <= index; i++ {
-		diff := tmp.Sub(ci.Indicator.Calculate(i), ci.Indicator.Calculate(i-1))
+		tmp1 := ci.Indicator.Calculate(i)
+		tmp2 := ci.Indicator.Calculate(i - 1)
+		diff := tmp.Sub(&tmp1, &tmp2)
 		if diff.Mul(diff, &ci.mult).Cmp(&decimal.Big{}) == 1 {
 			total.Add(total, diff.Abs(diff))
 		}
 	}
 
-	return total
+	return *total
 }
 
 type percentChangeIndicator struct {
@@ -92,13 +95,14 @@ func NewPercentChangeIndicator(indicator Indicator) Indicator {
 	return percentChangeIndicator{indicator}
 }
 
-func (pgi percentChangeIndicator) Calculate(index int) *decimal.Big {
+func (pgi percentChangeIndicator) Calculate(index int) decimal.Big {
 	if index == 0 {
-		return &decimal.Big{}
+		return decimal.Big{}
 	}
 
 	cp := pgi.Indicator.Calculate(index)
 	cplast := pgi.Indicator.Calculate(index - 1)
-	tmp := cp.Quo(cp, cplast)
-	return tmp.Sub(tmp, decimal.New(1, 0))
+	tmp := cp.Quo(&cp, &cplast)
+	r := decimal.New(1, 0)
+	return *r.Sub(tmp, r)
 }

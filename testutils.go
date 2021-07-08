@@ -43,11 +43,11 @@ func mockTimeSeriesOCHL(values ...[]float64) *TimeSeries {
 	ts := NewTimeSeries()
 	for i, ochl := range values {
 		candle := NewCandle(NewTimePeriod(time.Unix(int64(i), 0), time.Second))
-		candle.OpenPrice = new(decimal.Big).SetFloat64(ochl[0])
-		candle.ClosePrice = new(decimal.Big).SetFloat64(ochl[1])
-		candle.MaxPrice = new(decimal.Big).SetFloat64(ochl[2])
-		candle.MinPrice = new(decimal.Big).SetFloat64(ochl[3])
-		candle.Volume = new(decimal.Big).SetFloat64(float64(i))
+		candle.OpenPrice = *new(decimal.Big).SetFloat64(ochl[0])
+		candle.ClosePrice = *new(decimal.Big).SetFloat64(ochl[1])
+		candle.MaxPrice = *new(decimal.Big).SetFloat64(ochl[2])
+		candle.MinPrice = *new(decimal.Big).SetFloat64(ochl[3])
+		candle.Volume = *new(decimal.Big).SetFloat64(float64(i))
 
 		ts.AddCandle(candle)
 	}
@@ -60,15 +60,15 @@ func mockTimeSeries(values ...string) *TimeSeries {
 	for _, val := range values {
 		candle := NewCandle(NewTimePeriod(time.Unix(int64(candleIndex), 0), time.Second))
 		op, _ := new(decimal.Big).SetString(val)
-		candle.OpenPrice = op
+		candle.OpenPrice = *op
 		cp, _ := new(decimal.Big).SetString(val)
-		candle.ClosePrice = cp
+		candle.ClosePrice = *cp
 		tmp, _ := new(decimal.Big).SetString(val)
-		candle.MaxPrice = tmp.Add(tmp, decimal.New(1, 0))
+		candle.MaxPrice = *tmp.Add(tmp, decimal.New(1, 0))
 		tmp1, _ := new(decimal.Big).SetString(val)
-		candle.MinPrice = tmp1.Sub(tmp1, decimal.New(1, 0))
+		candle.MinPrice = *tmp1.Sub(tmp1, decimal.New(1, 0))
 		v, _ := new(decimal.Big).SetString(val)
-		candle.Volume = v
+		candle.Volume = *v
 
 		ts.AddCandle(candle)
 
@@ -88,7 +88,7 @@ func mockTimeSeriesFl(values ...float64) *TimeSeries {
 	return mockTimeSeries(strVals...)
 }
 
-func decimalEquals(t *testing.T, expected float64, actual *decimal.Big) {
+func decimalEquals(t *testing.T, expected float64, actual decimal.Big) {
 	f, _ := actual.Float64()
 	assert.Equal(t, fmt.Sprintf("%.4f", expected), fmt.Sprintf("%.4f", f))
 }
@@ -101,7 +101,8 @@ func dump(indicator Indicator) (values []float64) {
 
 	var index int
 	for {
-		f, _ := indicator.Calculate(index).Float64()
+		c := indicator.Calculate(index)
+		f, _ := c.Float64()
 		//log.Println(f)
 		values = append(values, f)
 		index++

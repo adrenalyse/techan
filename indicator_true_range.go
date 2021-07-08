@@ -17,23 +17,23 @@ func NewTrueRangeIndicator(series *TimeSeries) Indicator {
 	}
 }
 
-func (tri trueRangeIndicator) Calculate(index int) *decimal.Big {
+func (tri trueRangeIndicator) Calculate(index int) decimal.Big {
 	if index-1 < 0 {
-		return &decimal.Big{}
+		return decimal.Big{}
 	}
 
 	candle := tri.series.Candles[index]
 	previousClose := tri.series.Candles[index-1].ClosePrice
 
 	trueHigh := previousClose
-	if candle.MaxPrice.Cmp(previousClose) == 1 {
+	if candle.MaxPrice.Cmp(&previousClose) == 1 {
 		trueHigh = candle.MaxPrice
 	}
 
 	trueLow := previousClose
-	if candle.MinPrice.Cmp(previousClose) == -1 {
+	if candle.MinPrice.Cmp(&previousClose) == -1 {
 		trueLow = candle.MinPrice
 	}
 
-	return new(decimal.Big).Sub(trueHigh, trueLow)
+	return *new(decimal.Big).Sub(&trueHigh, &trueLow)
 }

@@ -8,5 +8,5 @@ import (
 // or trend. For example. MovingAverageIndicator implements the Indicator interface and, for a given index in the timeSeries,
 // returns the current moving average of the prices in that series.
 type Indicator interface {
-	Calculate(int) *decimal.Big
+	Calculate(int) decimal.Big
 }

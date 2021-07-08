@@ -11,7 +11,8 @@ func TestVarianceIndicator(t *testing.T) {
 		series := mockTimeSeries("0", "10")
 		stdDev := NewStandardDeviationIndicator(NewClosePriceIndicator(series))
 
-		assert.EqualValues(t, "0", stdDev.Calculate(0).String())
+		c := stdDev.Calculate(0)
+		assert.EqualValues(t, "0", c.String())
 	})
 
 	t.Run("returns the standard deviation when index > 2", func(t *testing.T) {
@@ -26,11 +27,17 @@ func TestVarianceIndicator(t *testing.T) {
 
 		varInd := NewVarianceIndicator(NewClosePriceIndicator(series))
 
-		assert.EqualValues(t, "16", varInd.Calculate(1).String())
-		assert.EqualValues(t, "238.2222222222222", varInd.Calculate(2).String())
-		assert.EqualValues(t, "186.1875", varInd.Calculate(3).String())
-		assert.EqualValues(t, "211.36", varInd.Calculate(4).String())
-		assert.EqualValues(t, "176.2222222222222", varInd.Calculate(5).String())
-		assert.EqualValues(t, "151.265306122449", varInd.Calculate(6).String())
+		c := varInd.Calculate(1)
+		assert.EqualValues(t, "16", c.String())
+		c = varInd.Calculate(2)
+		assert.EqualValues(t, "238.2222222222222", c.String())
+		c = varInd.Calculate(3)
+		assert.EqualValues(t, "186.1875", c.String())
+		c = varInd.Calculate(4)
+		assert.EqualValues(t, "211.36", c.String())
+		c = varInd.Calculate(5)
+		assert.EqualValues(t, "176.2222222222222", c.String())
+		c = varInd.Calculate(6)
+		assert.EqualValues(t, "151.265306122449", c.String())
 	})
 }

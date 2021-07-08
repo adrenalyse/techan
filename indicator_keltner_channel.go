@@ -29,15 +29,16 @@ func NewKeltnerChannelLowerIndicator(series *TimeSeries, window int) Indicator {
 	}
 }
 
-func (kci keltnerChannelIndicator) Calculate(index int) *decimal.Big {
+func (kci keltnerChannelIndicator) Calculate(index int) decimal.Big {
 	if index <= kci.window-1 {
-		return &decimal.Big{}
+		return decimal.Big{}
 	}
 
 	coefficient := decimal.New(2, 0)
 	coefficient.Mul(coefficient, &kci.mul)
 
 	tmp := kci.ema.Calculate(index)
+	tmp1 := kci.atr.Calculate(index)
 
-	return new(decimal.Big).Add(tmp, coefficient.Mul(kci.atr.Calculate(index), coefficient))
+	return *new(decimal.Big).Add(&tmp, coefficient.Mul(&tmp1, coefficient))
 }

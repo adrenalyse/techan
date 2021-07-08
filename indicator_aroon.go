@@ -12,9 +12,9 @@ type aroonIndicator struct {
 	lowIndex  int
 }
 
-func (ai *aroonIndicator) Calculate(index int) *decimal.Big {
+func (ai *aroonIndicator) Calculate(index int) decimal.Big {
 	if index < ai.window-1 {
-		return &decimal.Big{}
+		return decimal.Big{}
 	}
 
 	oneHundred := decimal.New(100, 0)
@@ -24,7 +24,7 @@ func (ai *aroonIndicator) Calculate(index int) *decimal.Big {
 	// windowAsDecimal
 	tmp2 := new(decimal.Big).SetFloat64(float64(ai.window))
 
-	return tmp2.Mul(tmp1.Quo(tmp1.Sub(tmp2, tmp1), tmp2), oneHundred)
+	return *tmp2.Mul(tmp1.Quo(tmp1.Sub(tmp2, tmp1), tmp2), oneHundred)
 }
 
 func (ai aroonIndicator) findLowIndex(index int) int {
@@ -33,7 +33,7 @@ func (ai aroonIndicator) findLowIndex(index int) int {
 		lowIndex := -1
 		for i := (index + 1) - ai.window; i <= index; i++ {
 			tmp := ai.indicator.Calculate(i)
-			value := tmp.Mul(tmp, &ai.direction)
+			value := tmp.Mul(&tmp, &ai.direction)
 			if value.Cmp(lv) == -1 {
 				lv = value
 				lowIndex = i
@@ -44,9 +44,9 @@ func (ai aroonIndicator) findLowIndex(index int) int {
 	}
 
 	tmp1 := ai.indicator.Calculate(index)
-	v1 := tmp1.Mul(tmp1, &ai.direction)
+	v1 := tmp1.Mul(&tmp1, &ai.direction)
 	tmp2 := ai.indicator.Calculate(ai.lowIndex)
-	v2 := tmp2.Mul(tmp2, &ai.direction)
+	v2 := tmp2.Mul(&tmp2, &ai.direction)
 
 	if v1.Cmp(v2) == -1 {
 		return index

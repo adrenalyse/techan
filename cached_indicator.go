@@ -13,11 +13,11 @@ type cachedIndicator interface {
 	windowSize() int
 }
 
-func cacheResult(indicator cachedIndicator, index int, val *decimal.Big) {
+func cacheResult(indicator cachedIndicator, index int, val decimal.Big) {
 	if index < len(indicator.cache()) {
-		indicator.cache()[index] = val
+		indicator.cache()[index] = &val
 	} else if index == len(indicator.cache()) {
-		indicator.setCache(append(indicator.cache(), val))
+		indicator.setCache(append(indicator.cache(), &val))
 	} else {
 		expandResultCache(indicator, index+1)
 		cacheResult(indicator, index, val)
@@ -31,7 +31,7 @@ func expandResultCache(indicator cachedIndicator, newSize int) {
 	indicator.setCache(append(indicator.cache(), expansion...))
 }
 
-func returnIfCached(indicator cachedIndicator, index int, firstValueFallback func(int) *decimal.Big) *decimal.Big {
+func returnIfCached(indicator cachedIndicator, index int, firstValueFallback func(int) decimal.Big) *decimal.Big {
 	if index >= len(indicator.cache()) {
 		expandResultCache(indicator, index+1)
 	} else if index < indicator.windowSize()-1 {
@@ -41,7 +41,7 @@ func returnIfCached(indicator cachedIndicator, index int, firstValueFallback fun
 	} else if index == indicator.windowSize()-1 {
 		value := firstValueFallback(index)
 		cacheResult(indicator, index, value)
-		return value
+		return &value
 	}
 
 	return nil

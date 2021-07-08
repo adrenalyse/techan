@@ -30,8 +30,9 @@ func NewBollingerLowerBandIndicator(indicator Indicator, window int, sigma float
 	}
 }
 
-func (bbi bbandIndicator) Calculate(index int) *decimal.Big {
+func (bbi bbandIndicator) Calculate(index int) decimal.Big {
 	tmp := bbi.ma.Calculate(index)
+	tmp1 := bbi.stdev.Calculate(index)
 	// bbi.ma.Calculate(index) + bbi.stdev.Calculate(index) * bbi.muladd
-	return tmp.FMA(bbi.stdev.Calculate(index), &bbi.muladd, tmp)
+	return *new(decimal.Big).FMA(&tmp1, &bbi.muladd, &tmp)
 }

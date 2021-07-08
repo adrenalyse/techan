@@ -15,17 +15,17 @@ func NewSimpleMovingAverage(indicator Indicator, window int) Indicator {
 	return smaIndicator{indicator, window}
 }
 
-func (sma smaIndicator) Calculate(index int) *decimal.Big {
+func (sma smaIndicator) Calculate(index int) decimal.Big {
 	if index < sma.window-1 {
-		return &decimal.Big{}
+		return decimal.Big{}
 	}
 
 	sum := &decimal.Big{}
-	tmp := &decimal.Big{}
+	tmp := decimal.Big{}
 	for i := index; i > index-sma.window; i-- {
 		tmp = sma.indicator.Calculate(i)
-		sum.Add(sum, tmp)
+		sum.Add(sum, &tmp)
 	}
 
-	return sum.Quo(sum, tmp.SetUint64(uint64(sma.window)))
+	return *sum.Quo(sum, tmp.SetUint64(uint64(sma.window)))
 }

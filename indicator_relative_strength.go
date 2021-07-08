@@ -19,12 +19,12 @@ func NewRelativeStrengthIndexIndicator(indicator Indicator, timeframe int) Indic
 	}
 }
 
-func (rsi relativeStrengthIndexIndicator) Calculate(index int) *decimal.Big {
+func (rsi relativeStrengthIndexIndicator) Calculate(index int) decimal.Big {
 	relativeStrength := rsi.rsIndicator.Calculate(index)
 
 	tmp := decimal.New(1, 0)
 
-	return tmp.Sub(&rsi.oneHundred, tmp.Quo(&rsi.oneHundred, tmp.Add(tmp, relativeStrength)))
+	return *tmp.Sub(&rsi.oneHundred, tmp.Quo(&rsi.oneHundred, tmp.Add(tmp, &relativeStrength)))
 }
 
 type relativeStrengthIndicator struct {
@@ -44,17 +44,17 @@ func NewRelativeStrengthIndicator(indicator Indicator, timeframe int) Indicator 
 	}
 }
 
-func (rs relativeStrengthIndicator) Calculate(index int) *decimal.Big {
+func (rs relativeStrengthIndicator) Calculate(index int) decimal.Big {
 	if index < rs.window-1 {
-		return &decimal.Big{}
+		return decimal.Big{}
 	}
 
 	avgGain := rs.avgGain.Calculate(index)
 	avgLoss := rs.avgLoss.Calculate(index)
 
 	if avgLoss.Cmp(&decimal.Big{}) == 0 {
-		return new(decimal.Big).SetInf(false)
+		return *new(decimal.Big).SetInf(false)
 	}
 
-	return avgGain.Quo(avgGain, avgLoss)
+	return *avgGain.Quo(&avgGain, &avgLoss)
 }

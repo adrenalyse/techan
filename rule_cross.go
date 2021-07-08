@@ -33,9 +33,13 @@ func (cr crossRule) IsSatisfied(index int, record *TradingRecord) bool {
 		return false
 	}
 
-	if cmp := cr.lower.Calculate(i).Cmp(cr.upper.Calculate(i)); cmp == 0 || cmp == cr.cmp {
+	tmp := cr.upper.Calculate(i)
+	tmpp := cr.lower.Calculate(i)
+	if cmp := tmpp.Cmp(&tmp); cmp == 0 || cmp == cr.cmp {
 		for ; i >= 0; i-- {
-			if cmp = cr.lower.Calculate(i).Cmp(cr.upper.Calculate(i)); cmp == 0 || cmp == -cr.cmp {
+			tmp1 := cr.upper.Calculate(i)
+			tmp2 := cr.lower.Calculate(i)
+			if cmp = tmp2.Cmp(&tmp1); cmp == 0 || cmp == -cr.cmp {
 				return true
 			}
 		}

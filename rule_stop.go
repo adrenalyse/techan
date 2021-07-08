@@ -25,7 +25,7 @@ func (slr stopLossRule) IsSatisfied(index int, record *TradingRecord) bool {
 
 	openPrice := record.CurrentPosition().CostBasis()
 	tmp := slr.Indicator.Calculate(index)
-	loss := tmp.Sub(tmp.Quo(tmp, openPrice), decimal.New(1, 0))
+	loss := tmp.Sub(tmp.Quo(&tmp, openPrice), decimal.New(1, 0))
 	comp := loss.Cmp(&slr.tolerance)
 	return comp == -1 || comp == 0
 }

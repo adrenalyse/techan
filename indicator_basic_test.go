@@ -20,12 +20,13 @@ func TestVolumeIndicator_Calculate(t *testing.T) {
 		Start: time.Now(),
 		End:   time.Now().Add(time.Minute),
 	})
-	candle.Volume = decimal.New(12080, 4)
+	candle.Volume = *decimal.New(12080, 4)
 
 	series.AddCandle(candle)
 
 	indicator := NewVolumeIndicator(series)
-	assert.EqualValues(t, "1.2080", indicator.Calculate(0).String())
+	c := indicator.Calculate(0)
+	assert.EqualValues(t, "1.2080", c.String())
 }
 
 func TestTypicalPriceIndicator_Calculate(t *testing.T) {
@@ -35,9 +36,9 @@ func TestTypicalPriceIndicator_Calculate(t *testing.T) {
 		Start: time.Now(),
 		End:   time.Now().Add(time.Minute),
 	})
-	candle.MinPrice = decimal.New(12080, 4)
-	candle.MaxPrice = decimal.New(122, 2)
-	candle.ClosePrice = decimal.New(1215, 3)
+	candle.MinPrice = *decimal.New(12080, 4)
+	candle.MaxPrice = *decimal.New(122, 2)
+	candle.ClosePrice = *decimal.New(1215, 3)
 
 	series.AddCandle(candle)
 

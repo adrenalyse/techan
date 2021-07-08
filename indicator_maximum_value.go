@@ -19,7 +19,7 @@ type maximumValueIndicator struct {
 	window    int
 }
 
-func (mvi maximumValueIndicator) Calculate(index int) *decimal.Big {
+func (mvi maximumValueIndicator) Calculate(index int) decimal.Big {
 	maxValue := new(decimal.Big).SetInf(true)
 
 	start := 0
@@ -30,9 +30,9 @@ func (mvi maximumValueIndicator) Calculate(index int) *decimal.Big {
 	for i := start; i <= index; i++ {
 		value := mvi.indicator.Calculate(i)
 		if value.Cmp(maxValue) == 1 {
-			maxValue = value
+			maxValue = &value
 		}
 	}
 
-	return maxValue
+	return *maxValue
 }

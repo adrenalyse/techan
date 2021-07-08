@@ -45,7 +45,9 @@ type OverIndicatorRule struct {
 
 // IsSatisfied returns true when the First Indicator is greater than the Second Indicator
 func (oir OverIndicatorRule) IsSatisfied(index int, record *TradingRecord) bool {
-	return oir.First.Calculate(index).Cmp(oir.Second.Calculate(index)) == 1
+	f := oir.First.Calculate(index)
+	s := oir.Second.Calculate(index)
+	return f.Cmp(&s) == 1
 }
 
 // UnderIndicatorRule is a rule where the First Indicator must be less than the Second Indicator to be Satisfied
@@ -56,7 +58,9 @@ type UnderIndicatorRule struct {
 
 // IsSatisfied returns true when the First Indicator is less than the Second Indicator
 func (uir UnderIndicatorRule) IsSatisfied(index int, record *TradingRecord) bool {
-	return uir.First.Calculate(index).Cmp(uir.Second.Calculate(index)) == -1
+	f := uir.First.Calculate(index)
+	s := uir.Second.Calculate(index)
+	return f.Cmp(&s) == -1
 }
 
 type percentChangeRule struct {
@@ -65,7 +69,8 @@ type percentChangeRule struct {
 }
 
 func (pgr percentChangeRule) IsSatisfied(index int, record *TradingRecord) bool {
-	return new(decimal.Big).Abs(pgr.indicator.Calculate(index)).Cmp(new(decimal.Big).Abs(&pgr.percent)) == 1
+	i := pgr.indicator.Calculate(index)
+	return i.Abs(&i).Cmp(pgr.percent.Abs(&pgr.percent)) == 1
 }
 
 // NewPercentChangeRule returns a rule whereby the given Indicator must have changed by a given percentage to be satisfied.

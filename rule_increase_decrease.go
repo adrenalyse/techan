@@ -13,7 +13,9 @@ func (ir IncreaseRule) IsSatisfied(index int, record *TradingRecord) bool {
 		return false
 	}
 
-	return ir.Calculate(index).Cmp(ir.Calculate(index-1)) == 1
+	tmp := ir.Calculate(index)
+	tmp2 := ir.Calculate(index - 1)
+	return tmp.Cmp(&tmp2) == 1
 }
 
 // DecreaseRule is satisfied when the given Indicator at the given index is less than the value at the previous
@@ -29,5 +31,7 @@ func (dr DecreaseRule) IsSatisfied(index int, record *TradingRecord) bool {
 		return false
 	}
 
-	return dr.Calculate(index).Cmp(dr.Calculate(index-1)) == -1
+	tmp1 := dr.Calculate(index)
+	tmp2 := dr.Calculate(index - 1)
+	return tmp1.Cmp(&tmp2) == -1
 }

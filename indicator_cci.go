@@ -18,7 +18,7 @@ func NewCCIIndicator(ts *TimeSeries, window int) Indicator {
 	}
 }
 
-func (ccii commidityChannelIndexIndicator) Calculate(index int) *decimal.Big {
+func (ccii commidityChannelIndexIndicator) Calculate(index int) decimal.Big {
 	typicalPrice := NewTypicalPriceIndicator(ccii.series)
 	typicalPriceSma := NewSimpleMovingAverage(typicalPrice, ccii.window)
 	meanDeviation := NewMeanDeviationIndicator(NewClosePriceIndicator(ccii.series), ccii.window)
@@ -26,8 +26,9 @@ func (ccii commidityChannelIndexIndicator) Calculate(index int) *decimal.Big {
 	// (typicalPrice.Calculate(index) - typicalPriceSma.Calculate(index)) / (meanDeviation.Calculate(index) * 0.015)
 	tmp := typicalPrice.Calculate(index)
 	tmp1 := typicalPriceSma.Calculate(index)
-	tmp.Sub(tmp, tmp1) // tmp used
-	tmp1.Mul(meanDeviation.Calculate(index), tmp1.SetFloat64(0.015))
+	tmp.Sub(&tmp, &tmp1) // tmp used
+	tmp2 := meanDeviation.Calculate(index)
+	tmp1.Mul(&tmp2, tmp1.SetFloat64(0.015))
 
-	return tmp1.Quo(tmp, tmp1)
+	return *new(decimal.Big).Quo(&tmp, &tmp1)
 }

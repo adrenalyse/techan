@@ -11,6 +11,6 @@ func NewFixedIndicator(vals ...float64) Indicator {
 	return fixedIndicator(vals)
 }
 
-func (fi fixedIndicator) Calculate(index int) *decimal.Big {
-	return new(decimal.Big).SetFloat64(fi[index])
+func (fi fixedIndicator) Calculate(index int) decimal.Big {
+	return *new(decimal.Big).SetFloat64(fi[index])
 }

@@ -18,6 +18,8 @@ func NewDifferenceIndicator(minuend, subtrahend Indicator) Indicator {
 	}
 }
 
-func (di differenceIndicator) Calculate(index int) *decimal.Big {
-	return new(decimal.Big).Sub(di.minuend.Calculate(index), di.subtrahend.Calculate(index))
+func (di differenceIndicator) Calculate(index int) decimal.Big {
+	tmp1 := di.minuend.Calculate(index)
+	tmp2 := di.subtrahend.Calculate(index)
+	return *new(decimal.Big).Sub(&tmp1, &tmp2)
 }

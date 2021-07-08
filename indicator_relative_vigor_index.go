@@ -20,32 +20,32 @@ func NewRelativeVigorIndexIndicator(series *TimeSeries) Indicator {
 	}
 }
 
-func (rvii relativeVigorIndexIndicator) Calculate(index int) *decimal.Big {
+func (rvii relativeVigorIndexIndicator) Calculate(index int) decimal.Big {
 	if index < 3 {
-		return &decimal.Big{}
+		return decimal.Big{}
 	}
 
 	two := decimal.New(2, 0)
 
 	a := rvii.numerator.Calculate(index)
 	tmp1 := rvii.numerator.Calculate(index - 1)
-	b := tmp1.Mul(tmp1, two)
+	b := tmp1.Mul(&tmp1, two)
 	tmp2 := rvii.numerator.Calculate(index - 2)
-	c := tmp2.Mul(tmp2, two)
+	c := tmp2.Mul(&tmp2, two)
 	d := rvii.numerator.Calculate(index - 3)
 
-	num := a.Quo(a.Add(a, b.Add(b, c.Add(c, d))), decimal.New(6, 0))
+	num := a.Quo(a.Add(&a, b.Add(b, c.Add(c, &d))), decimal.New(6, 0))
 
 	e := rvii.denominator.Calculate(index)
 	tmp1 = rvii.denominator.Calculate(index - 1)
-	f := tmp1.Mul(tmp1, two)
+	f := tmp1.Mul(&tmp1, two)
 	tmp2 = rvii.denominator.Calculate(index - 2)
-	g := tmp2.Mul(tmp2, two)
+	g := tmp2.Mul(&tmp2, two)
 	h := rvii.denominator.Calculate(index - 3)
 
-	denom := e.Quo(e.Add(e, f.Add(f, g.Add(g, h))), decimal.New(6, 0))
+	denom := e.Quo(e.Add(&e, f.Add(f, g.Add(g, &h))), decimal.New(6, 0))
 
-	return num.Quo(num, denom)
+	return *two.Quo(num, denom)
 }
 
 type relativeVigorIndexSignalLine struct {
@@ -60,17 +60,20 @@ func NewRelativeVigorSignalLine(series *TimeSeries) Indicator {
 	}
 }
 
-func (rvsn relativeVigorIndexSignalLine) Calculate(index int) *decimal.Big {
+func (rvsn relativeVigorIndexSignalLine) Calculate(index int) decimal.Big {
 	if index < 3 {
-		return &decimal.Big{}
+		return decimal.Big{}
 	}
 
 	rvi := rvsn.relativeVigorIndex.Calculate(index)
 	tmp := rvsn.relativeVigorIndex.Calculate(index - 1)
-	i := tmp.Mul(rvsn.relativeVigorIndex.Calculate(index-1), decimal.New(2, 0))
+	tmp3 := rvsn.relativeVigorIndex.Calculate(index - 1)
+	i := tmp.Mul(&tmp3, decimal.New(2, 0))
 	tmp1 := rvsn.relativeVigorIndex.Calculate(index - 2)
-	j := tmp1.Mul(tmp1, decimal.New(2, 0))
+	j := tmp1.Mul(&tmp1, decimal.New(2, 0))
 	k := rvsn.relativeVigorIndex.Calculate(index - 3)
 
-	return rvi.Quo(rvi.Add(rvi, i.Add(i, j.Add(j, k))), decimal.New(6, 0))
+	r := decimal.New(6, 0)
+
+	return *r.Quo(rvi.Add(&rvi, i.Add(i, j.Add(j, &k))), r)
 }

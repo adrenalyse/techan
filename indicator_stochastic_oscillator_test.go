@@ -80,5 +80,5 @@ func TestFastStochasticIndicatorNoPriceChange(t *testing.T) {
 	)
 
 	k := NewFastStochasticIndicator(ts, 2)
-	assert.Equal(t, new(decimal.Big).SetInf(false), k.Calculate(1))
+	assert.Equal(t, *new(decimal.Big).SetInf(false), k.Calculate(1))
 }

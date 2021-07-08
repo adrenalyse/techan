@@ -18,10 +18,10 @@ func NewTrendlineIndicator(indicator Indicator, window int) Indicator {
 	}
 }
 
-func (tli trendLineIndicator) Calculate(index int) *decimal.Big {
+func (tli trendLineIndicator) Calculate(index int) decimal.Big {
 	window := Min(index+1, tli.window)
 
-	values := make([]*decimal.Big, window)
+	values := make([]decimal.Big, window)
 
 	for i := 0; i < window; i++ {
 		values[i] = tli.indicator.Calculate(index - (window - 1) + i)
@@ -33,47 +33,49 @@ func (tli trendLineIndicator) Calculate(index int) *decimal.Big {
 
 	tmp3 := sumX(values)
 	tmp4 := sumY(values)
-	ab := tmp2.Sub(tmp2.Mul(sumXy(values), n), tmp4.Mul(tmp3, tmp4)) // tmp1, tmp2, tmp3 occupés
-	cd := tmp1.Sub(tmp1.Mul(sumX2(values), n), tmp3.Mul(tmp3, tmp3)) // tmp1, tmp2 occupés
+	tmp5 := sumXy(values)
+	tmp6 := sumX2(values)
+	ab := tmp2.Sub(tmp2.Mul(&tmp5, n), tmp4.Mul(&tmp3, &tmp4)) // tmp1, tmp2, tmp3 occupés
+	cd := tmp1.Sub(tmp1.Mul(&tmp6, n), tmp3.Mul(&tmp3, &tmp3)) // tmp1, tmp2 occupés
 
-	return ab.Quo(ab, cd)
+	return *ab.Quo(ab, cd)
 }
 
-func sumX(decimals []*decimal.Big) (s *decimal.Big) {
-	s = &decimal.Big{}
+func sumX(decimals []decimal.Big) (s decimal.Big) {
+	s = decimal.Big{}
 	tmp := &decimal.Big{}
 	for i := range decimals {
-		s.Add(s, tmp.SetFloat64(float64(i)))
+		s.Add(&s, tmp.SetFloat64(float64(i)))
 	}
 
 	return s
 }
 
-func sumY(decimals []*decimal.Big) (b *decimal.Big) {
-	b = &decimal.Big{}
+func sumY(decimals []decimal.Big) (b decimal.Big) {
+	b = decimal.Big{}
 	for _, d := range decimals {
-		b.Add(b, d)
+		b.Add(&b, &d)
 	}
 
 	return b
 }
 
-func sumXy(decimals []*decimal.Big) (b *decimal.Big) {
-	b = &decimal.Big{}
+func sumXy(decimals []decimal.Big) (b decimal.Big) {
+	b = decimal.Big{}
 	tmp := &decimal.Big{}
 	for i, d := range decimals {
-		b.Add(b, tmp.Mul(d, tmp.SetFloat64(float64(i))))
+		b.Add(&b, tmp.Mul(&d, tmp.SetFloat64(float64(i))))
 	}
 
 	return b
 }
 
-func sumX2(decimals []*decimal.Big) *decimal.Big {
-	b := &decimal.Big{}
+func sumX2(decimals []decimal.Big) decimal.Big {
+	b := decimal.Big{}
 	tmp := &decimal.Big{}
 	for i := range decimals {
 		tmp.SetFloat64(float64(i))
-		b.Add(b, tmp.Mul(tmp, tmp))
+		b.Add(&b, tmp.Mul(tmp, tmp))
 	}
 
 	return b

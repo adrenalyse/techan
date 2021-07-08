@@ -17,13 +17,17 @@ func TestRelativeVigorIndexIndicator_Calculate(t *testing.T) {
 	rvii := NewRelativeVigorIndexIndicator(series)
 
 	t.Run("Returns zero when index < 4", func(t *testing.T) {
-		assert.EqualValues(t, "0", rvii.Calculate(0).String())
-		assert.EqualValues(t, "0", rvii.Calculate(1).String())
-		assert.EqualValues(t, "0", rvii.Calculate(2).String())
+		c := rvii.Calculate(0)
+		assert.EqualValues(t, "0", c.String())
+		c = rvii.Calculate(1)
+		assert.EqualValues(t, "0", c.String())
+		c = rvii.Calculate(2)
+		assert.EqualValues(t, "0", c.String())
 	})
 
 	t.Run("Calculates rvii", func(t *testing.T) {
-		assert.EqualValues(t, "0.7560975609756098", rvii.Calculate(3).String())
+		c := rvii.Calculate(3)
+		assert.EqualValues(t, "0.7560975609756098", c.String())
 	})
 }
 
@@ -42,12 +46,16 @@ func TestRelativeVigorIndexSignalLine_Calculate(t *testing.T) {
 	signalLine := NewRelativeVigorSignalLine(series)
 
 	t.Run("Returns zero when index < 0", func(t *testing.T) {
-		assert.EqualValues(t, "0", signalLine.Calculate(0).String())
-		assert.EqualValues(t, "0", signalLine.Calculate(1).String())
-		assert.EqualValues(t, "0", signalLine.Calculate(2).String())
+		c := signalLine.Calculate(0)
+		assert.EqualValues(t, "0", c.String())
+		c = signalLine.Calculate(1)
+		assert.EqualValues(t, "0", c.String())
+		c = signalLine.Calculate(2)
+		assert.EqualValues(t, "0", c.String())
 	})
 
 	t.Run("Calculates rvii signal line", func(t *testing.T) {
-		assert.EqualValues(t, "0.5752316290535085", signalLine.Calculate(7).String())
+		c := signalLine.Calculate(7)
+		assert.EqualValues(t, "0.5752316290535085", c.String())
 	})
 }

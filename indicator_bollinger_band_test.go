@@ -113,19 +113,23 @@ func TestBollingerBandIndicator(t *testing.T) {
 	bbLO := NewBollingerLowerBandIndicator(src, window, sigma)
 
 	tmp := &decimal.Big{}
-	tmp1 := &decimal.Big{}
 	for i := window - 1; i < len(ts.Candles); i++ {
 		j := i - (window - 1)
 		tmp, _ = tmp.SetString(SMAs[j])
-		decimalAlmostEquals(t, tmp, sma.Calculate(i), 0.01)
+		c := sma.Calculate(i)
+		decimalAlmostEquals(t, tmp, &c, 0.01)
 		tmp, _ = tmp.SetString(STDEVs[j])
-		decimalAlmostEquals(t, tmp, wstd.Calculate(i), 0.01)
+		c = wstd.Calculate(i)
+		decimalAlmostEquals(t, tmp, &c, 0.01)
 		tmp, _ = tmp.SetString(BBUPs[j])
-		decimalAlmostEquals(t, tmp, bbUP.Calculate(i), 0.01)
+		c = bbUP.Calculate(i)
+		decimalAlmostEquals(t, tmp, &c, 0.01)
 		tmp, _ = tmp.SetString(BBLOs[j])
-		decimalAlmostEquals(t, tmp, bbLO.Calculate(i), 0.01)
+		c = bbLO.Calculate(i)
+		decimalAlmostEquals(t, tmp, &c, 0.01)
 		tmp, _ = tmp.SetString(BBWs[j])
-		tmp1 = bbUP.Calculate(i)
-		decimalAlmostEquals(t, tmp, tmp1.Sub(tmp1, bbLO.Calculate(i)), 0.01)
+		tmp1 := bbUP.Calculate(i)
+		c = bbLO.Calculate(i)
+		decimalAlmostEquals(t, tmp, tmp1.Sub(&tmp1, &c), 0.01)
 	}
 }
