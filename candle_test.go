@@ -1,13 +1,13 @@
 package techan
 
 import (
-	"github.com/ericlagergren/decimal"
 	"testing"
 	"time"
 
 	"fmt"
 	"strings"
 
+	"github.com/sdcoffey/big"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -18,22 +18,17 @@ func TestCandle_AddTrade(t *testing.T) {
 		End:   now.Add(time.Minute),
 	})
 
-	candle.AddTrade(*decimal.New(1, 0), *decimal.New(2, 0)) // Open
-	candle.AddTrade(*decimal.New(1, 0), *decimal.New(5, 0)) // High
-	candle.AddTrade(*decimal.New(1, 0), *decimal.New(1, 0)) // Low
-	candle.AddTrade(*decimal.New(1, 0), *decimal.New(3, 0)) // No Diff
-	candle.AddTrade(*decimal.New(1, 0), *decimal.New(3, 0)) // Close
+	candle.AddTrade(big.NewDecimal(1), big.NewDecimal(2)) // Open
+	candle.AddTrade(big.NewDecimal(1), big.NewDecimal(5)) // High
+	candle.AddTrade(big.NewDecimal(1), big.NewDecimal(1)) // Low
+	candle.AddTrade(big.NewDecimal(1), big.NewDecimal(3)) // No Diff
+	candle.AddTrade(big.NewDecimal(1), big.NewDecimal(3)) // Close
 
-	f, _ := candle.OpenPrice.Float64()
-	assert.EqualValues(t, 2, f)
-	f, _ = candle.MaxPrice.Float64()
-	assert.EqualValues(t, 5, f)
-	f, _ = candle.MinPrice.Float64()
-	assert.EqualValues(t, 1, f)
-	f, _ = candle.ClosePrice.Float64()
-	assert.EqualValues(t, 3, f)
-	f, _ = candle.Volume.Float64()
-	assert.EqualValues(t, 5, f)
+	assert.EqualValues(t, 2, candle.OpenPrice.Float())
+	assert.EqualValues(t, 5, candle.MaxPrice.Float())
+	assert.EqualValues(t, 1, candle.MinPrice.Float())
+	assert.EqualValues(t, 3, candle.ClosePrice.Float())
+	assert.EqualValues(t, 5, candle.Volume.Float())
 	assert.EqualValues(t, 5, candle.TradeCount)
 }
 
@@ -44,19 +39,19 @@ func TestCandle_String(t *testing.T) {
 		End:   now.Add(time.Minute),
 	})
 
-	candle.ClosePrice = *decimal.New(1, 0)
-	candle.OpenPrice = *decimal.New(2, 0)
-	candle.MaxPrice = *decimal.New(3, 0)
-	candle.MinPrice = decimal.Big{}
-	candle.Volume = *decimal.New(10, 0)
+	candle.ClosePrice = big.NewFromString("1")
+	candle.OpenPrice = big.NewFromString("2")
+	candle.MaxPrice = big.NewFromString("3")
+	candle.MinPrice = big.NewFromString("0")
+	candle.Volume = big.NewFromString("10")
 
 	expected := strings.TrimSpace(fmt.Sprintf(`
 Time:	%s
-Open:	2
-Close:	1
-High:	3
-Low:	0
-Volume:	10
+Open:	2.00
+Close:	1.00
+High:	3.00
+Low:	0.00
+Volume:	10.00
 `, candle.Period))
 
 	assert.EqualValues(t, expected, candle.String())

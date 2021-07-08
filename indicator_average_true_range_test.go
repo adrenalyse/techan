@@ -16,8 +16,8 @@ func TestAverageTrueRangeIndicator(t *testing.T) {
 		2,
 		2,
 		2,
-		2.346666666666667,
-		2.346666666666667,
+		2.3467,
+		2.3467,
 	}
 
 	indicatorEquals(t, expectedValues, atrIndicator)

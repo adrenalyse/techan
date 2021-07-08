@@ -4,9 +4,10 @@ package techan
 
 import (
 	"fmt"
-	"github.com/ericlagergren/decimal"
 	"io"
 	"time"
+
+	"github.com/sdcoffey/big"
 )
 
 // Analysis is an interface that describes a methodology for taking a TradingRecord as input,
@@ -20,7 +21,7 @@ type TotalProfitAnalysis struct{}
 
 // Analyze analyzes the trading record for total profit.
 func (tps TotalProfitAnalysis) Analyze(record *TradingRecord) float64 {
-	totalProfit := &decimal.Big{}
+	totalProfit := big.NewDecimal(0)
 	for _, trade := range record.Trades {
 		if trade.IsClosed() {
 
@@ -28,16 +29,15 @@ func (tps TotalProfitAnalysis) Analyze(record *TradingRecord) float64 {
 			exitValue := trade.ExitValue()
 
 			if trade.IsLong() {
-				totalProfit.Add(totalProfit, exitValue.Sub(exitValue, costBasis))
+				totalProfit = totalProfit.Add(exitValue.Sub(costBasis))
 			} else if trade.IsShort() {
-				totalProfit.Sub(totalProfit, exitValue.Sub(exitValue, costBasis))
+				totalProfit = totalProfit.Sub(exitValue.Sub(costBasis))
 			}
 
 		}
 	}
 
-	f, _ := totalProfit.Float64()
-	return f
+	return totalProfit.Float()
 }
 
 // PercentGainAnalysis analyzes the trading record for the percentage profit gained relative to start
@@ -46,10 +46,7 @@ type PercentGainAnalysis struct{}
 // Analyze analyzes the trading record for the percentage profit gained relative to start
 func (pga PercentGainAnalysis) Analyze(record *TradingRecord) float64 {
 	if len(record.Trades) > 0 && record.Trades[0].IsClosed() {
-		tmp := record.Trades[len(record.Trades)-1].ExitValue()
-		tmp1 := tmp.Quo(tmp, record.Trades[0].CostBasis())
-		f, _ := tmp1.Sub(tmp1, decimal.New(1, 0)).Float64()
-		return f
+		return (record.Trades[len(record.Trades)-1].ExitValue().Div(record.Trades[0].CostBasis())).Sub(big.NewDecimal(1)).Float()
 	}
 
 	return 0
@@ -74,8 +71,7 @@ func (lta LogTradesAnalysis) Analyze(record *TradingRecord) float64 {
 		fmt.Fprintln(lta.Writer, fmt.Sprintf("%s - enter with buy %s (%s @ $%s)", trade.EntranceOrder().ExecutionTime.UTC().Format(time.RFC822), trade.EntranceOrder().Security, trade.EntranceOrder().Amount, trade.EntranceOrder().Price))
 		fmt.Fprintln(lta.Writer, fmt.Sprintf("%s - exit with sell %s (%s @ $%s)", trade.ExitOrder().ExecutionTime.UTC().Format(time.RFC822), trade.ExitOrder().Security, trade.ExitOrder().Amount, trade.ExitOrder().Price))
 
-		tmp := trade.ExitValue()
-		profit := tmp.Sub(tmp, trade.CostBasis())
+		profit := trade.ExitValue().Sub(trade.CostBasis())
 		fmt.Fprintln(lta.Writer, fmt.Sprintf("Profit: $%s", profit))
 	}
 
@@ -109,15 +105,11 @@ type ProfitableTradesAnalysis struct{}
 // Analyze returns the number of profitable trades in a trading record
 func (pta ProfitableTradesAnalysis) Analyze(record *TradingRecord) float64 {
 	var profitableTrades int
-	tmp := new(decimal.Big)
-	tmp1 := new(decimal.Big)
 	for _, trade := range record.Trades {
-		tmp.Set(trade.EntranceOrder().Amount)
-		costBasis := tmp.Mul(tmp, trade.EntranceOrder().Price)
-		tmp1.Set(trade.ExitOrder().Amount)
-		sellPrice := tmp1.Mul(tmp1, trade.ExitOrder().Price)
+		costBasis := trade.EntranceOrder().Amount.Mul(trade.EntranceOrder().Price)
+		sellPrice := trade.ExitOrder().Amount.Mul(trade.ExitOrder().Price)
 
-		if sellPrice.Cmp(costBasis) == 1 {
+		if sellPrice.GT(costBasis) {
 			profitableTrades++
 		}
 	}
@@ -151,23 +143,20 @@ func (baha BuyAndHoldAnalysis) Analyze(record *TradingRecord) float64 {
 		return 0
 	}
 
-	tmp := new(decimal.Big).SetFloat64(baha.StartingMoney)
 	openOrder := Order{
 		Side:   BUY,
-		Amount: tmp.Quo(tmp, &baha.TimeSeries.Candles[0].ClosePrice),
-		Price:  &baha.TimeSeries.Candles[0].ClosePrice,
+		Amount: big.NewDecimal(baha.StartingMoney).Div(baha.TimeSeries.Candles[0].ClosePrice),
+		Price:  baha.TimeSeries.Candles[0].ClosePrice,
 	}
 
 	closeOrder := Order{
 		Side:   SELL,
 		Amount: openOrder.Amount,
-		Price:  &baha.TimeSeries.Candles[len(baha.TimeSeries.Candles)-1].ClosePrice,
+		Price:  baha.TimeSeries.Candles[len(baha.TimeSeries.Candles)-1].ClosePrice,
 	}
 
 	pos := NewPosition(openOrder)
 	pos.Exit(closeOrder)
 
-	tmp = pos.ExitValue()
-	f, _ := tmp.Sub(tmp, pos.CostBasis()).Float64()
-	return f
+	return pos.ExitValue().Sub(pos.CostBasis()).Float()
 }

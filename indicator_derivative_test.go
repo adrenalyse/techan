@@ -13,19 +13,16 @@ func TestDerivativeIndicator(t *testing.T) {
 	}
 
 	t.Run("returns zero at index zero", func(t *testing.T) {
-		c := indicator.Calculate(0)
-		assert.EqualValues(t, "0", c.String())
+		assert.EqualValues(t, "0", indicator.Calculate(0).String())
 	})
 
 	t.Run("returns the derivative", func(t *testing.T) {
-		c := indicator.Calculate(1)
-		assert.EqualValues(t, "0", c.String())
+		assert.EqualValues(t, "0", indicator.Calculate(1).String())
 
 		for i := 2; i < len(series.Candles); i++ {
 			expected := series.Candles[i-2].ClosePrice
 
-			c := indicator.Calculate(i)
-			assert.EqualValues(t, expected.String(), c.String())
+			assert.EqualValues(t, expected.String(), indicator.Calculate(i).String())
 		}
 	})
 }

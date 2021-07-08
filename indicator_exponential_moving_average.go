@@ -1,13 +1,11 @@
 package techan
 
-import (
-	"github.com/ericlagergren/decimal"
-)
+import "github.com/sdcoffey/big"
 
 type emaIndicator struct {
 	indicator   Indicator
 	window      int
-	alpha       decimal.Big
+	alpha       big.Decimal
 	resultCache resultCache
 }
 
@@ -15,30 +13,27 @@ type emaIndicator struct {
 // the given windowSize, with values closer to current index given more weight. A more in-depth explanation can be found here:
 // http://www.investopedia.com/terms/e/ema.asp
 func NewEMAIndicator(indicator Indicator, window int) Indicator {
-	tmp := decimal.New(2, 0)
 	return &emaIndicator{
 		indicator:   indicator,
 		window:      window,
-		alpha:       *tmp.Quo(tmp, new(decimal.Big).SetUint64(uint64(window+1))),
-		resultCache: make([]*decimal.Big, 1000),
+		alpha:       big.ONE.Frac(2).Div(big.NewFromInt(window + 1)),
+		resultCache: make([]*big.Decimal, 1000),
 	}
 }
 
-func (ema *emaIndicator) Calculate(index int) decimal.Big {
-	if cachedValue := returnIfCached(ema, index, func(i int) decimal.Big {
+func (ema *emaIndicator) Calculate(index int) big.Decimal {
+	if cachedValue := returnIfCached(ema, index, func(i int) big.Decimal {
 		return NewSimpleMovingAverage(ema.indicator, ema.window).Calculate(i)
 	}); cachedValue != nil {
 		return *cachedValue
 	}
 
-	tmp := ema.indicator.Calculate(index)
-	todayVal := tmp.Mul(&tmp, &ema.alpha)
-	tmp1 := ema.Calculate(index - 1)
-	result := new(decimal.Big).Add(todayVal, tmp1.Mul(&tmp1, &ema.alpha))
+	todayVal := ema.indicator.Calculate(index).Mul(ema.alpha)
+	result := todayVal.Add(ema.Calculate(index - 1).Mul(ema.alpha))
 
-	cacheResult(ema, index, *result)
+	cacheResult(ema, index, result)
 
-	return *result
+	return result
 }
 
 func (ema emaIndicator) cache() resultCache { return ema.resultCache }

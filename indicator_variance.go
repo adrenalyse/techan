@@ -1,8 +1,6 @@
 package techan
 
-import (
-	"github.com/ericlagergren/decimal"
-)
+import "github.com/sdcoffey/big"
 
 // NewVarianceIndicator provides a way to find the variance in a base indicator, where variances is the sum of squared
 // deviations from the mean at any given index in the time series.
@@ -17,22 +15,19 @@ type varianceIndicator struct {
 }
 
 // Calculate returns the Variance for this indicator at the given index
-func (vi varianceIndicator) Calculate(index int) decimal.Big {
+func (vi varianceIndicator) Calculate(index int) big.Decimal {
 	if index < 1 {
-		return decimal.Big{}
+		return big.ZERO
 	}
 
 	avgIndicator := NewSimpleMovingAverage(vi.Indicator, index+1)
 	avg := avgIndicator.Calculate(index)
-	variance := &decimal.Big{}
-	var tmp decimal.Big
+	variance := big.ZERO
 
 	for i := 0; i <= index; i++ {
-		tmp = vi.Indicator.Calculate(i)
-		tmp.Sub(&tmp, &avg)
-		pow := tmp.Mul(&tmp, &tmp)
-		variance.Add(variance, pow)
+		pow := vi.Indicator.Calculate(i).Sub(avg).Pow(2)
+		variance = variance.Add(pow)
 	}
 
-	return *variance.Quo(variance, avg.SetFloat64(float64(index+1)))
+	return variance.Div(big.NewDecimal(float64(index + 1)))
 }

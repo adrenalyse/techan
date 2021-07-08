@@ -1,7 +1,8 @@
 package techan
 
 import (
-	"github.com/ericlagergren/decimal"
+	"github.com/sdcoffey/big"
+	"log"
 )
 
 type averageTrueRangeIndicator struct {
@@ -19,18 +20,21 @@ func NewAverageTrueRangeIndicator(series *TimeSeries, window int) Indicator {
 	}
 }
 
-func (atr averageTrueRangeIndicator) Calculate(index int) decimal.Big {
+func (atr averageTrueRangeIndicator) Calculate(index int) big.Decimal {
 	if index < atr.window {
-		return decimal.Big{}
+		return big.ZERO
 	}
 
-	sum := &decimal.Big{}
+	sum := big.ZERO
 	indicator := NewTrueRangeIndicator(atr.series)
 
 	for i := index; i > index-atr.window; i-- {
-		c := indicator.Calculate(i)
-		sum.Add(sum, &c)
+		//log.Println(i, sum, indicator.Calculate(i))
+		sum = sum.Add(indicator.Calculate(i))
 	}
 
-	return *sum.Quo(sum, decimal.New(int64(atr.window), 0))
+	r := sum.Div(big.NewFromInt(atr.window))
+	log.Println(sum, atr.window, r)
+
+	return r
 }

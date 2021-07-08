@@ -1,8 +1,6 @@
 package techan
 
-import (
-	"github.com/ericlagergren/decimal"
-)
+import "github.com/sdcoffey/big"
 
 type differenceIndicator struct {
 	minuend    Indicator
@@ -18,8 +16,6 @@ func NewDifferenceIndicator(minuend, subtrahend Indicator) Indicator {
 	}
 }
 
-func (di differenceIndicator) Calculate(index int) decimal.Big {
-	tmp1 := di.minuend.Calculate(index)
-	tmp2 := di.subtrahend.Calculate(index)
-	return *new(decimal.Big).Sub(&tmp1, &tmp2)
+func (di differenceIndicator) Calculate(index int) big.Decimal {
+	return di.minuend.Calculate(index).Sub(di.subtrahend.Calculate(index))
 }

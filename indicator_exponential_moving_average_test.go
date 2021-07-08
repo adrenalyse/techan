@@ -17,10 +17,10 @@ func TestExponentialMovingAverage(t *testing.T) {
 			63.46,
 			63.685,
 			63.7675,
-			63.35875,
-			63.364375,
-			62.3471875,
-			61.92859375,
+			63.3588,
+			63.3644,
+			62.3472,
+			61.9286,
 		}
 
 		closePriceIndicator := NewClosePriceIndicator(mockedTimeSeries)

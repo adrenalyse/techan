@@ -1,8 +1,6 @@
 package techan
 
-import (
-	"github.com/ericlagergren/decimal"
-)
+import "github.com/sdcoffey/big"
 
 // Position is a pair of two Order objects
 type Position struct {
@@ -63,20 +61,18 @@ func (p *Position) ExitOrder() *Order {
 }
 
 // CostBasis returns the price to enter this order
-func (p *Position) CostBasis() *decimal.Big {
+func (p *Position) CostBasis() big.Decimal {
 	if p.EntranceOrder() != nil {
-		tmp := new(decimal.Big).Copy(p.EntranceOrder().Amount)
-		return tmp.Mul(tmp, p.EntranceOrder().Price)
+		return p.EntranceOrder().Amount.Mul(p.EntranceOrder().Price)
 	}
-	return &decimal.Big{}
+	return big.ZERO
 }
 
 // ExitValue returns the value accrued by closing the position
-func (p *Position) ExitValue() *decimal.Big {
+func (p *Position) ExitValue() big.Decimal {
 	if p.IsClosed() {
-		tmp := new(decimal.Big).Copy(p.ExitOrder().Amount)
-		return tmp.Mul(tmp, p.ExitOrder().Price)
+		return p.ExitOrder().Amount.Mul(p.ExitOrder().Price)
 	}
 
-	return &decimal.Big{}
+	return big.ZERO
 }

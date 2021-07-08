@@ -1,11 +1,10 @@
 package techan
 
 import (
-	"fmt"
-	"github.com/ericlagergren/decimal"
 	"testing"
 	"time"
 
+	"github.com/sdcoffey/big"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -20,13 +19,12 @@ func TestVolumeIndicator_Calculate(t *testing.T) {
 		Start: time.Now(),
 		End:   time.Now().Add(time.Minute),
 	})
-	candle.Volume = *decimal.New(12080, 4)
+	candle.Volume = big.NewFromString("1.2080")
 
 	series.AddCandle(candle)
 
 	indicator := NewVolumeIndicator(series)
-	c := indicator.Calculate(0)
-	assert.EqualValues(t, "1.2080", c.String())
+	assert.EqualValues(t, "1.208", indicator.Calculate(0).FormattedString(3))
 }
 
 func TestTypicalPriceIndicator_Calculate(t *testing.T) {
@@ -36,15 +34,13 @@ func TestTypicalPriceIndicator_Calculate(t *testing.T) {
 		Start: time.Now(),
 		End:   time.Now().Add(time.Minute),
 	})
-	candle.MinPrice = *decimal.New(12080, 4)
-	candle.MaxPrice = *decimal.New(122, 2)
-	candle.ClosePrice = *decimal.New(1215, 3)
+	candle.MinPrice = big.NewFromString("1.2080")
+	candle.MaxPrice = big.NewFromString("1.22")
+	candle.ClosePrice = big.NewFromString("1.215")
 
 	series.AddCandle(candle)
 
 	typicalPrice := NewTypicalPriceIndicator(series).Calculate(0)
-	typicalPrice = NewTypicalPriceIndicator(series).Calculate(0)
 
-	f, _ := typicalPrice.Float64()
-	assert.EqualValues(t, "1.214333", fmt.Sprintf("%f", f))
+	assert.EqualValues(t, "1.2143", typicalPrice.FormattedString(4))
 }

@@ -1,8 +1,6 @@
 package techan
 
-import (
-	"github.com/ericlagergren/decimal"
-)
+import "github.com/sdcoffey/big"
 
 // DerivativeIndicator returns an indicator that calculates the derivative of the underlying Indicator.
 // The derivative is defined as the difference between the value at the previous index and the value at the current index.
@@ -12,12 +10,10 @@ type DerivativeIndicator struct {
 }
 
 // Calculate returns the derivative of the underlying indicator. At index 0, it will always return 0.
-func (di DerivativeIndicator) Calculate(index int) decimal.Big {
+func (di DerivativeIndicator) Calculate(index int) big.Decimal {
 	if index == 0 {
-		return decimal.Big{}
+		return big.ZERO
 	}
 
-	tmp1 := di.Indicator.Calculate(index)
-	tmp2 := di.Indicator.Calculate(index - 1)
-	return *new(decimal.Big).Sub(&tmp1, &tmp2)
+	return di.Indicator.Calculate(index).Sub(di.Indicator.Calculate(index - 1))
 }

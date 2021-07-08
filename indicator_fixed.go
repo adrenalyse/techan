@@ -1,8 +1,6 @@
 package techan
 
-import (
-	"github.com/ericlagergren/decimal"
-)
+import "github.com/sdcoffey/big"
 
 type fixedIndicator []float64
 
@@ -11,6 +9,6 @@ func NewFixedIndicator(vals ...float64) Indicator {
 	return fixedIndicator(vals)
 }
 
-func (fi fixedIndicator) Calculate(index int) decimal.Big {
-	return *new(decimal.Big).SetFloat64(fi[index])
+func (fi fixedIndicator) Calculate(index int) big.Decimal {
+	return big.NewDecimal(fi[index])
 }

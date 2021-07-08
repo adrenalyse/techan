@@ -1,9 +1,9 @@
 package techan
 
 import (
-	"github.com/ericlagergren/decimal"
 	"testing"
 
+	"github.com/sdcoffey/big"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -20,8 +20,8 @@ func TestPositionNewRule(t *testing.T) {
 
 		record.Operate(Order{
 			Side:   BUY,
-			Amount: decimal.New(1, 0),
-			Price:  decimal.New(1, 0),
+			Amount: big.ONE,
+			Price:  big.ONE,
 		})
 
 		rule := PositionNewRule{}
@@ -44,8 +44,8 @@ func TestPositionOpenRule(t *testing.T) {
 
 		record.Operate(Order{
 			Side:   BUY,
-			Amount: decimal.New(1, 0),
-			Price:  decimal.New(1, 0),
+			Amount: big.ONE,
+			Price:  big.ONE,
 		})
 
 		rule := PositionOpenRule{}

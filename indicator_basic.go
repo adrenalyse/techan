@@ -1,8 +1,6 @@
 package techan
 
-import (
-	"github.com/ericlagergren/decimal"
-)
+import "github.com/sdcoffey/big"
 
 type volumeIndicator struct {
 	*TimeSeries
@@ -13,7 +11,7 @@ func NewVolumeIndicator(series *TimeSeries) Indicator {
 	return volumeIndicator{series}
 }
 
-func (vi volumeIndicator) Calculate(index int) decimal.Big {
+func (vi volumeIndicator) Calculate(index int) big.Decimal {
 	return vi.Candles[index].Volume
 }
 
@@ -26,7 +24,7 @@ func NewClosePriceIndicator(series *TimeSeries) Indicator {
 	return closePriceIndicator{series}
 }
 
-func (cpi closePriceIndicator) Calculate(index int) decimal.Big {
+func (cpi closePriceIndicator) Calculate(index int) big.Decimal {
 	return cpi.Candles[index].ClosePrice
 }
 
@@ -41,7 +39,7 @@ func NewHighPriceIndicator(series *TimeSeries) Indicator {
 	}
 }
 
-func (hpi highPriceIndicator) Calculate(index int) decimal.Big {
+func (hpi highPriceIndicator) Calculate(index int) big.Decimal {
 	return hpi.Candles[index].MaxPrice
 }
 
@@ -56,7 +54,7 @@ func NewLowPriceIndicator(series *TimeSeries) Indicator {
 	}
 }
 
-func (lpi lowPriceIndicator) Calculate(index int) decimal.Big {
+func (lpi lowPriceIndicator) Calculate(index int) big.Decimal {
 	return lpi.Candles[index].MinPrice
 }
 
@@ -71,7 +69,7 @@ func NewOpenPriceIndicator(series *TimeSeries) Indicator {
 	}
 }
 
-func (opi openPriceIndicator) Calculate(index int) decimal.Big {
+func (opi openPriceIndicator) Calculate(index int) big.Decimal {
 	return opi.Candles[index].OpenPrice
 }
 
@@ -85,8 +83,7 @@ func NewTypicalPriceIndicator(series *TimeSeries) Indicator {
 	return typicalPriceIndicator{series}
 }
 
-func (tpi typicalPriceIndicator) Calculate(index int) decimal.Big {
-	tmp1 := new(decimal.Big).Add(&tpi.Candles[index].MaxPrice, &tpi.Candles[index].MinPrice)
-	tmp1.Add(tmp1, &tpi.Candles[index].ClosePrice)
-	return *tmp1.Quo(tmp1, decimal.New(3, 0))
+func (tpi typicalPriceIndicator) Calculate(index int) big.Decimal {
+	numerator := tpi.Candles[index].MaxPrice.Add(tpi.Candles[index].MinPrice).Add(tpi.Candles[index].ClosePrice)
+	return numerator.Div(big.NewFromString("3"))
 }

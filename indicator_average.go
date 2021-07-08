@@ -1,8 +1,6 @@
 package techan
 
-import (
-	"github.com/ericlagergren/decimal"
-)
+import "github.com/sdcoffey/big"
 
 type averageIndicator struct {
 	Indicator
@@ -27,7 +25,6 @@ func NewAverageLossesIndicator(indicator Indicator, window int) Indicator {
 	}
 }
 
-func (ai averageIndicator) Calculate(index int) decimal.Big {
-	tmp := ai.Indicator.Calculate(index)
-	return *tmp.Quo(&tmp, new(decimal.Big).SetFloat64(float64(Min(index+1, ai.window))))
+func (ai averageIndicator) Calculate(index int) big.Decimal {
+	return ai.Indicator.Calculate(index).Div(big.NewDecimal(float64(Min(index+1, ai.window))))
 }

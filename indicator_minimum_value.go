@@ -1,8 +1,6 @@
 package techan
 
-import (
-	"github.com/ericlagergren/decimal"
-)
+import "github.com/sdcoffey/big"
 
 // NewMinimumValueIndicator returns a derivative Indicator which returns the minimum value
 // present in a given window. Use a window value of -1 to include all values in the
@@ -19,8 +17,8 @@ type minimumValueIndicator struct {
 	window    int
 }
 
-func (mvi minimumValueIndicator) Calculate(index int) decimal.Big {
-	minValue := new(decimal.Big).SetInf(false)
+func (mvi minimumValueIndicator) Calculate(index int) big.Decimal {
+	minValue := big.NewFromString("Inf")
 
 	start := 0
 	if mvi.window > 0 {
@@ -29,10 +27,10 @@ func (mvi minimumValueIndicator) Calculate(index int) decimal.Big {
 
 	for i := start; i <= index; i++ {
 		value := mvi.indicator.Calculate(i)
-		if value.Cmp(minValue) == -1 {
-			minValue = &value
+		if value.LT(minValue) {
+			minValue = value
 		}
 	}
 
-	return *minValue
+	return minValue
 }

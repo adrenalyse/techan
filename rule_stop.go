@@ -1,12 +1,10 @@
 package techan
 
-import (
-	"github.com/ericlagergren/decimal"
-)
+import "github.com/sdcoffey/big"
 
 type stopLossRule struct {
 	Indicator
-	tolerance decimal.Big
+	tolerance big.Decimal
 }
 
 // NewStopLossRule returns a new rule that is satisfied when the given loss tolerance (a percentage) is met or exceeded.
@@ -14,7 +12,7 @@ type stopLossRule struct {
 func NewStopLossRule(series *TimeSeries, lossTolerance float64) Rule {
 	return stopLossRule{
 		Indicator: NewClosePriceIndicator(series),
-		tolerance: *new(decimal.Big).SetFloat64(lossTolerance),
+		tolerance: big.NewDecimal(lossTolerance),
 	}
 }
 
@@ -24,8 +22,6 @@ func (slr stopLossRule) IsSatisfied(index int, record *TradingRecord) bool {
 	}
 
 	openPrice := record.CurrentPosition().CostBasis()
-	tmp := slr.Indicator.Calculate(index)
-	loss := tmp.Sub(tmp.Quo(&tmp, openPrice), decimal.New(1, 0))
-	comp := loss.Cmp(&slr.tolerance)
-	return comp == -1 || comp == 0
+	loss := slr.Indicator.Calculate(index).Div(openPrice).Sub(big.ONE)
+	return loss.LTE(slr.tolerance)
 }

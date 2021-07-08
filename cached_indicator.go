@@ -1,10 +1,8 @@
 package techan
 
-import (
-	"github.com/ericlagergren/decimal"
-)
+import "github.com/sdcoffey/big"
 
-type resultCache []*decimal.Big
+type resultCache []*big.Decimal
 
 type cachedIndicator interface {
 	Indicator
@@ -13,7 +11,7 @@ type cachedIndicator interface {
 	windowSize() int
 }
 
-func cacheResult(indicator cachedIndicator, index int, val decimal.Big) {
+func cacheResult(indicator cachedIndicator, index int, val big.Decimal) {
 	if index < len(indicator.cache()) {
 		indicator.cache()[index] = &val
 	} else if index == len(indicator.cache()) {
@@ -27,15 +25,15 @@ func cacheResult(indicator cachedIndicator, index int, val decimal.Big) {
 func expandResultCache(indicator cachedIndicator, newSize int) {
 	sizeDiff := newSize - len(indicator.cache())
 
-	expansion := make([]*decimal.Big, sizeDiff)
+	expansion := make([]*big.Decimal, sizeDiff)
 	indicator.setCache(append(indicator.cache(), expansion...))
 }
 
-func returnIfCached(indicator cachedIndicator, index int, firstValueFallback func(int) decimal.Big) *decimal.Big {
+func returnIfCached(indicator cachedIndicator, index int, firstValueFallback func(int) big.Decimal) *big.Decimal {
 	if index >= len(indicator.cache()) {
 		expandResultCache(indicator, index+1)
 	} else if index < indicator.windowSize()-1 {
-		return &decimal.Big{}
+		return &big.ZERO
 	} else if val := indicator.cache()[index]; val != nil {
 		return val
 	} else if index == indicator.windowSize()-1 {

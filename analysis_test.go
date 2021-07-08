@@ -4,14 +4,13 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ericlagergren/decimal"
-
 	"bytes"
 
 	"bufio"
 
 	"fmt"
 
+	"github.com/sdcoffey/big"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -25,29 +24,29 @@ func TestTotalProfitAnalysis(t *testing.T) {
 		orders := []Order{
 			{
 				Side:          BUY,
-				Amount:        decimal.New(1, 0),
-				Price:         decimal.New(1, 0),
+				Amount:        big.NewDecimal(1),
+				Price:         big.NewDecimal(1),
 				Security:      example,
 				ExecutionTime: time.Now(),
 			},
 			{
 				Side:          SELL,
-				Amount:        decimal.New(2, 0),
-				Price:         decimal.New(1, 0),
+				Amount:        big.NewDecimal(2),
+				Price:         big.NewDecimal(1),
 				Security:      example,
 				ExecutionTime: time.Now(),
 			},
 			{
 				Side:          SELL,
-				Amount:        decimal.New(1, 0),
-				Price:         decimal.New(2, 0),
+				Amount:        big.NewDecimal(1),
+				Price:         big.NewDecimal(2),
 				Security:      example,
 				ExecutionTime: time.Now(),
 			},
 			{
 				Side:          BUY,
-				Amount:        decimal.New(1, 0),
-				Price:         decimal.New(1, 0),
+				Amount:        big.NewDecimal(1),
+				Price:         big.NewDecimal(1),
 				Security:      example,
 				ExecutionTime: time.Now(),
 			},
@@ -61,16 +60,16 @@ func TestTotalProfitAnalysis(t *testing.T) {
 
 		record.Operate(Order{
 			Side:          BUY,
-			Amount:        decimal.New(1, 0),
-			Price:         decimal.New(1, 0),
+			Amount:        big.ONE,
+			Price:         big.ONE,
 			Security:      example,
 			ExecutionTime: time.Now(),
 		})
 
 		record.Operate(Order{
 			Side:          SELL,
-			Amount:        decimal.New(5, 1),
-			Price:         decimal.New(1, 0),
+			Amount:        big.NewFromString("0.5"),
+			Price:         big.ONE,
 			Security:      example,
 			ExecutionTime: time.Now(),
 		})
@@ -96,15 +95,15 @@ func TestPercentGainAnalysis(t *testing.T) {
 		orders := []Order{
 			{
 				Side:          BUY,
-				Amount:        decimal.New(1, 0),
-				Price:         decimal.New(1, 0),
+				Amount:        big.NewDecimal(1),
+				Price:         big.NewDecimal(1),
 				Security:      example,
 				ExecutionTime: time.Now(),
 			},
 			{
 				Side:          SELL,
-				Amount:        decimal.New(2, 0),
-				Price:         decimal.New(1, 0),
+				Amount:        big.NewDecimal(2),
+				Price:         big.NewDecimal(1),
 				Security:      example,
 				ExecutionTime: time.Now(),
 			},
@@ -126,15 +125,15 @@ func TestPercentGainAnalysis(t *testing.T) {
 		orders := []Order{
 			{
 				Side:          BUY,
-				Amount:        decimal.New(2, 0),
-				Price:         decimal.New(1, 0),
+				Amount:        big.NewDecimal(2),
+				Price:         big.NewDecimal(1),
 				Security:      example,
 				ExecutionTime: time.Now(),
 			},
 			{
 				Side:          SELL,
-				Amount:        decimal.New(1, 0),
-				Price:         decimal.New(1, 0),
+				Amount:        big.NewDecimal(1),
+				Price:         big.NewDecimal(1),
 				Security:      example,
 				ExecutionTime: time.Now(),
 			},
@@ -156,29 +155,29 @@ func TestPercentGainAnalysis(t *testing.T) {
 		orders := []Order{
 			{
 				Side:          BUY,
-				Amount:        decimal.New(2, 0),
-				Price:         decimal.New(1, 0),
+				Amount:        big.NewDecimal(2),
+				Price:         big.NewDecimal(1),
 				Security:      example,
 				ExecutionTime: time.Now(),
 			},
 			{
 				Side:          SELL,
-				Amount:        decimal.New(1, 0),
-				Price:         decimal.New(1, 0),
+				Amount:        big.NewDecimal(1),
+				Price:         big.NewDecimal(1),
 				Security:      example,
 				ExecutionTime: time.Now(),
 			},
 			{
 				Side:          BUY,
-				Amount:        decimal.New(1, 0),
-				Price:         decimal.New(1, 0),
+				Amount:        big.NewDecimal(1),
+				Price:         big.NewDecimal(1),
 				Security:      example,
 				ExecutionTime: time.Now(),
 			},
 			{
 				Side:          SELL,
-				Amount:        decimal.New(1, 0),
-				Price:         decimal.New(125, 2),
+				Amount:        big.NewDecimal(1),
+				Price:         big.NewDecimal(1.25),
 				Security:      example,
 				ExecutionTime: time.Now(),
 			},
@@ -221,29 +220,29 @@ func TestLogTradesAnalysis(t *testing.T) {
 	orders := []Order{
 		{
 			Side:          BUY,
-			Amount:        decimal.New(1, 0),
-			Price:         decimal.New(2, 0),
+			Amount:        big.NewDecimal(1),
+			Price:         big.NewDecimal(2),
 			Security:      example,
 			ExecutionTime: dates[0],
 		},
 		{
 			Side:          SELL,
-			Amount:        decimal.New(1, 0),
-			Price:         decimal.New(1, 0),
+			Amount:        big.NewDecimal(1),
+			Price:         big.NewDecimal(1),
 			Security:      example,
 			ExecutionTime: dates[1],
 		},
 		{
 			Side:          BUY,
-			Amount:        decimal.New(1, 0),
-			Price:         decimal.New(1, 0),
+			Amount:        big.NewDecimal(1),
+			Price:         big.NewDecimal(1),
 			Security:      example,
 			ExecutionTime: dates[2],
 		},
 		{
 			Side:          SELL,
-			Amount:        decimal.New(1, 0),
-			Price:         decimal.New(125, 2),
+			Amount:        big.NewDecimal(1),
+			Price:         big.NewDecimal(1.25),
 			Security:      example,
 			ExecutionTime: dates[3],
 		},
@@ -291,29 +290,29 @@ func TestPeriodProfitAnalysis(t *testing.T) {
 	orders := []Order{
 		{
 			Side:          BUY,
-			Amount:        decimal.New(1, 0),
-			Price:         decimal.New(1, 0),
+			Amount:        big.NewDecimal(1),
+			Price:         big.NewDecimal(1),
 			Security:      example,
 			ExecutionTime: now,
 		},
 		{
 			Side:          SELL,
-			Amount:        decimal.New(2, 0),
-			Price:         decimal.New(1, 0),
+			Amount:        big.NewDecimal(2),
+			Price:         big.NewDecimal(1),
 			Security:      example,
 			ExecutionTime: now.Add(time.Minute),
 		},
 		{
 			Side:          BUY,
-			Amount:        decimal.New(2, 0),
-			Price:         decimal.New(1, 0),
+			Amount:        big.NewDecimal(2),
+			Price:         big.NewDecimal(1),
 			Security:      example,
 			ExecutionTime: now.Add(time.Minute * 2),
 		},
 		{
 			Side:          SELL,
-			Amount:        decimal.New(3, 0),
-			Price:         decimal.New(1, 0),
+			Amount:        big.NewDecimal(3),
+			Price:         big.NewDecimal(1),
 			Security:      example,
 			ExecutionTime: now.Add(time.Minute * 3),
 		},
@@ -336,29 +335,29 @@ func TestProfitableTradesAnalysis(t *testing.T) {
 	orders := []Order{
 		{
 			Side:          BUY,
-			Amount:        decimal.New(1, 0),
-			Price:         decimal.New(1, 0),
+			Amount:        big.NewDecimal(1),
+			Price:         big.NewDecimal(1),
 			Security:      example,
 			ExecutionTime: time.Now(),
 		},
 		{
 			Side:          SELL,
-			Amount:        decimal.New(2, 0),
-			Price:         decimal.New(1, 0),
+			Amount:        big.NewDecimal(2),
+			Price:         big.NewDecimal(1),
 			Security:      example,
 			ExecutionTime: time.Now(),
 		},
 		{
 			Side:          BUY,
-			Amount:        decimal.New(2, 0),
-			Price:         decimal.New(1, 0),
+			Amount:        big.NewDecimal(2),
+			Price:         big.NewDecimal(1),
 			Security:      example,
 			ExecutionTime: time.Now(),
 		},
 		{
 			Side:          SELL,
-			Amount:        decimal.New(1, 0),
-			Price:         decimal.New(1, 0),
+			Amount:        big.NewDecimal(1),
+			Price:         big.NewDecimal(1),
 			Security:      example,
 			ExecutionTime: time.Now(),
 		},
@@ -379,29 +378,29 @@ func TestAverageProfitAnalysis(t *testing.T) {
 	orders := []Order{
 		{
 			Side:          BUY,
-			Amount:        decimal.New(1, 0),
-			Price:         decimal.New(1, 0),
+			Amount:        big.NewDecimal(1),
+			Price:         big.NewDecimal(1),
 			Security:      example,
 			ExecutionTime: time.Now(),
 		},
 		{
 			Side:          SELL,
-			Amount:        decimal.New(2, 0),
-			Price:         decimal.New(1, 0),
+			Amount:        big.NewDecimal(2),
+			Price:         big.NewDecimal(1),
 			Security:      example,
 			ExecutionTime: time.Now(),
 		},
 		{
 			Side:          BUY,
-			Amount:        decimal.New(2, 0),
-			Price:         decimal.New(1, 0),
+			Amount:        big.NewDecimal(2),
+			Price:         big.NewDecimal(1),
 			Security:      example,
 			ExecutionTime: time.Now(),
 		},
 		{
 			Side:          SELL,
-			Amount:        decimal.New(5, 0),
-			Price:         decimal.New(1, 0),
+			Amount:        big.NewDecimal(5),
+			Price:         big.NewDecimal(1),
 			Security:      example,
 			ExecutionTime: time.Now(),
 		},
@@ -433,29 +432,29 @@ func TestBuyAndHoldAnalysis(t *testing.T) {
 		orders := []Order{
 			{
 				Side:          BUY,
-				Amount:        decimal.New(1, 0),
-				Price:         decimal.New(1, 0),
+				Amount:        big.NewDecimal(1),
+				Price:         big.NewDecimal(1),
 				Security:      example,
 				ExecutionTime: time.Now(),
 			},
 			{
 				Side:          SELL,
-				Amount:        decimal.New(2, 0),
-				Price:         decimal.New(1, 0),
+				Amount:        big.NewDecimal(2),
+				Price:         big.NewDecimal(1),
 				Security:      example,
 				ExecutionTime: time.Now(),
 			},
 			{
 				Side:          BUY,
-				Amount:        decimal.New(3, 0),
-				Price:         decimal.New(1, 0),
+				Amount:        big.NewDecimal(3),
+				Price:         big.NewDecimal(1),
 				Security:      example,
 				ExecutionTime: time.Now(),
 			},
 			{
 				Side:          SELL,
-				Amount:        decimal.New(6, 0),
-				Price:         decimal.New(1, 0),
+				Amount:        big.NewDecimal(6),
+				Price:         big.NewDecimal(1),
 				Security:      example,
 				ExecutionTime: time.Now(),
 			},

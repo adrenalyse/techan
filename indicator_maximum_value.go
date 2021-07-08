@@ -1,8 +1,6 @@
 package techan
 
-import (
-	"github.com/ericlagergren/decimal"
-)
+import "github.com/sdcoffey/big"
 
 // NewMaximumValueIndicator returns a derivative Indicator which returns the maximum value
 // present in a given window. Use a window value of -1 to include all values in the
@@ -19,8 +17,8 @@ type maximumValueIndicator struct {
 	window    int
 }
 
-func (mvi maximumValueIndicator) Calculate(index int) decimal.Big {
-	maxValue := new(decimal.Big).SetInf(true)
+func (mvi maximumValueIndicator) Calculate(index int) big.Decimal {
+	maxValue := big.NewFromString("-Inf")
 
 	start := 0
 	if mvi.window > 0 {
@@ -29,10 +27,10 @@ func (mvi maximumValueIndicator) Calculate(index int) decimal.Big {
 
 	for i := start; i <= index; i++ {
 		value := mvi.indicator.Calculate(i)
-		if value.Cmp(maxValue) == 1 {
-			maxValue = &value
+		if value.GT(maxValue) {
+			maxValue = value
 		}
 	}
 
-	return *maxValue
+	return maxValue
 }

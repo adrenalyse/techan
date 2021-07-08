@@ -1,8 +1,6 @@
 package techan
 
-import (
-	"github.com/ericlagergren/decimal"
-)
+import "github.com/sdcoffey/big"
 
 // Rule is an interface describing an algorithm by which a set of criteria may be satisfied
 type Rule interface {
@@ -45,9 +43,7 @@ type OverIndicatorRule struct {
 
 // IsSatisfied returns true when the First Indicator is greater than the Second Indicator
 func (oir OverIndicatorRule) IsSatisfied(index int, record *TradingRecord) bool {
-	f := oir.First.Calculate(index)
-	s := oir.Second.Calculate(index)
-	return f.Cmp(&s) == 1
+	return oir.First.Calculate(index).GT(oir.Second.Calculate(index))
 }
 
 // UnderIndicatorRule is a rule where the First Indicator must be less than the Second Indicator to be Satisfied
@@ -58,19 +54,16 @@ type UnderIndicatorRule struct {
 
 // IsSatisfied returns true when the First Indicator is less than the Second Indicator
 func (uir UnderIndicatorRule) IsSatisfied(index int, record *TradingRecord) bool {
-	f := uir.First.Calculate(index)
-	s := uir.Second.Calculate(index)
-	return f.Cmp(&s) == -1
+	return uir.First.Calculate(index).LT(uir.Second.Calculate(index))
 }
 
 type percentChangeRule struct {
 	indicator Indicator
-	percent   decimal.Big
+	percent   big.Decimal
 }
 
 func (pgr percentChangeRule) IsSatisfied(index int, record *TradingRecord) bool {
-	i := pgr.indicator.Calculate(index)
-	return i.Abs(&i).Cmp(pgr.percent.Abs(&pgr.percent)) == 1
+	return pgr.indicator.Calculate(index).Abs().GT(pgr.percent.Abs())
 }
 
 // NewPercentChangeRule returns a rule whereby the given Indicator must have changed by a given percentage to be satisfied.
@@ -78,6 +71,6 @@ func (pgr percentChangeRule) IsSatisfied(index int, record *TradingRecord) bool 
 func NewPercentChangeRule(indicator Indicator, percent float64) Rule {
 	return percentChangeRule{
 		indicator: NewPercentChangeIndicator(indicator),
-		percent:   *new(decimal.Big).SetFloat64(percent),
+		percent:   big.NewDecimal(percent),
 	}
 }

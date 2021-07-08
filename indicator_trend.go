@@ -1,8 +1,6 @@
 package techan
 
-import (
-	"github.com/ericlagergren/decimal"
-)
+import "github.com/sdcoffey/big"
 
 type trendLineIndicator struct {
 	indicator Indicator
@@ -18,64 +16,56 @@ func NewTrendlineIndicator(indicator Indicator, window int) Indicator {
 	}
 }
 
-func (tli trendLineIndicator) Calculate(index int) decimal.Big {
+func (tli trendLineIndicator) Calculate(index int) big.Decimal {
 	window := Min(index+1, tli.window)
 
-	values := make([]decimal.Big, window)
+	values := make([]big.Decimal, window)
 
 	for i := 0; i < window; i++ {
 		values[i] = tli.indicator.Calculate(index - (window - 1) + i)
 	}
 
-	tmp1 := decimal.New(1, 0)
-	tmp2 := &decimal.Big{}
-	n := tmp1.Mul(tmp1, tmp2.SetFloat64(float64(window))) // tmp1 occupé
+	n := big.ONE.Mul(big.NewDecimal(float64(window)))
+	ab := sumXy(values).Mul(n).Sub(sumX(values).Mul(sumY(values)))
+	cd := sumX2(values).Mul(n).Sub(sumX(values).Pow(2))
 
-	tmp3 := sumX(values)
-	tmp4 := sumY(values)
-	tmp5 := sumXy(values)
-	tmp6 := sumX2(values)
-	ab := tmp2.Sub(tmp2.Mul(&tmp5, n), tmp4.Mul(&tmp3, &tmp4)) // tmp1, tmp2, tmp3 occupés
-	cd := tmp1.Sub(tmp1.Mul(&tmp6, n), tmp3.Mul(&tmp3, &tmp3)) // tmp1, tmp2 occupés
-
-	return *ab.Quo(ab, cd)
+	return ab.Div(cd)
 }
 
-func sumX(decimals []decimal.Big) (s decimal.Big) {
-	s = decimal.Big{}
-	tmp := &decimal.Big{}
+func sumX(decimals []big.Decimal) (s big.Decimal) {
+	s = big.ZERO
+
 	for i := range decimals {
-		s.Add(&s, tmp.SetFloat64(float64(i)))
+		s = s.Add(big.NewDecimal(float64(i)))
 	}
 
 	return s
 }
 
-func sumY(decimals []decimal.Big) (b decimal.Big) {
-	b = decimal.Big{}
+func sumY(decimals []big.Decimal) (b big.Decimal) {
+	b = big.ZERO
 	for _, d := range decimals {
-		b.Add(&b, &d)
+		b = b.Add(d)
 	}
 
-	return b
+	return
 }
 
-func sumXy(decimals []decimal.Big) (b decimal.Big) {
-	b = decimal.Big{}
-	tmp := &decimal.Big{}
+func sumXy(decimals []big.Decimal) (b big.Decimal) {
+	b = big.ZERO
+
 	for i, d := range decimals {
-		b.Add(&b, tmp.Mul(&d, tmp.SetFloat64(float64(i))))
+		b = b.Add(d.Mul(big.NewDecimal(float64(i))))
 	}
 
-	return b
+	return
 }
 
-func sumX2(decimals []decimal.Big) decimal.Big {
-	b := decimal.Big{}
-	tmp := &decimal.Big{}
+func sumX2(decimals []big.Decimal) big.Decimal {
+	b := big.ZERO
+
 	for i := range decimals {
-		tmp.SetFloat64(float64(i))
-		b.Add(&b, tmp.Mul(tmp, tmp))
+		b = b.Add(big.NewDecimal(float64(i)).Pow(2))
 	}
 
 	return b
