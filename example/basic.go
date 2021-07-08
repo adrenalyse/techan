@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/sdcoffey/techan"
+	"github.com/adrenalyse/techan"
 )
 
 // BasicEma is an example of how to create a basic Exponential moving average indicator
