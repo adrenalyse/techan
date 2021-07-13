@@ -2,7 +2,6 @@ package techan
 
 import (
 	"github.com/sdcoffey/big"
-	"log"
 )
 
 type bbandIndicator struct {
@@ -34,6 +33,5 @@ func NewBollingerLowerBandIndicator(indicator Indicator, window int, sigma float
 func (bbi bbandIndicator) Calculate(index int) big.Decimal {
 	tmp := bbi.ma.Calculate(index)
 	tmp1 := bbi.stdev.Calculate(index)
-	log.Println(tmp, tmp1)
 	return tmp.Add(tmp1.Mul(bbi.muladd))
 }
