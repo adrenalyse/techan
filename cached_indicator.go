@@ -1,6 +1,9 @@
 package techan
 
-import "github.com/sdcoffey/big"
+import (
+	"github.com/sdcoffey/big"
+	"log"
+)
 
 type resultCache []*big.Decimal
 
@@ -27,6 +30,7 @@ func expandResultCache(indicator cachedIndicator, newSize int) {
 
 	expansion := make([]*big.Decimal, sizeDiff)
 	indicator.setCache(append(indicator.cache(), expansion...))
+	log.Println(len(indicator.cache()))
 }
 
 func returnIfCached(indicator cachedIndicator, index int, firstValueFallback func(int) big.Decimal) *big.Decimal {
