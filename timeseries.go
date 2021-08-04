@@ -2,11 +2,35 @@ package techan
 
 import (
 	"fmt"
+	"sync"
 )
 
 // TimeSeries represents an array of candles
 type TimeSeries struct {
 	Candles []*Candle
+}
+
+var timeSeriesPool = sync.Pool{
+	New: func() interface{} {
+		return &TimeSeries{}
+	},
+}
+
+func (ts *TimeSeries) ReturnToPool() {
+	if ts == nil {
+		return
+	}
+	for _, candle := range ts.Candles {
+		candle.ReturnToPool()
+	}
+	f0 := ts.Candles[:0]
+	*ts = TimeSeries{}
+	ts.Candles = f0
+	timeSeriesPool.Put(ts)
+}
+
+func TimeSeriesFromPool() *TimeSeries {
+	return timeSeriesPool.Get().(*TimeSeries)
 }
 
 // NewTimeSeries returns a new, empty, TimeSeries

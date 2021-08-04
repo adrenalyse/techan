@@ -3,6 +3,7 @@ package techan
 import (
 	"fmt"
 	"strings"
+	"sync"
 
 	"github.com/adrenalyse/big"
 )
@@ -16,6 +17,43 @@ type Candle struct {
 	MinPrice   big.Decimal
 	Volume     big.Decimal
 	TradeCount uint
+}
+
+var candlePool = sync.Pool{
+	New: func() interface{} {
+		return &Candle{}
+	},
+}
+
+func (c *Candle) ReturnToPool() {
+	if c == nil {
+		return
+	}
+	volume := c.Volume
+	volume.ReturnToPool()
+	maxPrice := c.MaxPrice
+	maxPrice.ReturnToPool()
+	closePrice := c.ClosePrice
+	closePrice.ReturnToPool()
+	minPrice := c.MinPrice
+	minPrice.ReturnToPool()
+	openPrice := c.OpenPrice
+	openPrice.ReturnToPool()
+
+	*c = Candle{
+		Period:     TimePeriod{},
+		OpenPrice:  openPrice,
+		ClosePrice: closePrice,
+		MaxPrice:   maxPrice,
+		MinPrice:   minPrice,
+		Volume:     volume,
+		TradeCount: 0,
+	}
+	candlePool.Put(c)
+}
+
+func CandleFromPool() *Candle {
+	return candlePool.Get().(*Candle)
 }
 
 // NewCandle returns a new *Candle for a given time period
