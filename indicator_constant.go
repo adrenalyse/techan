@@ -1,6 +1,6 @@
 package techan
 
-import "github.com/sdcoffey/big"
+import "github.com/adrenalyse/big"
 
 type constantIndicator float64
 

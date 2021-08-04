@@ -7,7 +7,7 @@ import (
 	"io"
 	"time"
 
-	"github.com/sdcoffey/big"
+	"github.com/adrenalyse/big"
 )
 
 // Analysis is an interface that describes a methodology for taking a TradingRecord as input,

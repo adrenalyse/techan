@@ -3,7 +3,7 @@ package techan
 import (
 	"math"
 
-	"github.com/sdcoffey/big"
+	"github.com/adrenalyse/big"
 )
 
 type kIndicator struct {

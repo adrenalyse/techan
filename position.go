@@ -1,6 +1,6 @@
 package techan
 
-import "github.com/sdcoffey/big"
+import "github.com/adrenalyse/big"
 
 // Position is a pair of two Order objects
 type Position struct {

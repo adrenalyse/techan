@@ -3,7 +3,7 @@ package techan
 import (
 	"time"
 
-	"github.com/sdcoffey/big"
+	"github.com/adrenalyse/big"
 )
 
 // OrderSide is a simple enumeration representing the side of an Order (buy or sell)

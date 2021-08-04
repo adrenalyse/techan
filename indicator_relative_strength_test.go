@@ -4,7 +4,7 @@ import (
 	"math"
 	"testing"
 
-	"github.com/sdcoffey/big"
+	"github.com/adrenalyse/big"
 	"github.com/stretchr/testify/assert"
 )
 

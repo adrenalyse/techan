@@ -1,7 +1,7 @@
 package techan
 
 import (
-	"github.com/sdcoffey/big"
+	"github.com/adrenalyse/big"
 )
 
 // NewStandardDeviationIndicator calculates the standard deviation of a base indicator.
