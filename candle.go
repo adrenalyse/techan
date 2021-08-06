@@ -29,7 +29,6 @@ func (c *Candle) ReturnToPool() {
 	if c == nil {
 		return
 	}
-
 	volume := c.Volume
 	volume.ReturnToPool()
 	maxPrice := c.MaxPrice
