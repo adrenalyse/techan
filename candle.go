@@ -30,13 +30,17 @@ func (c *Candle) ReturnToPool() {
 		return
 	}
 
-	c.Volume.ReturnToPool()
-	c.MaxPrice.ReturnToPool()
-	c.ClosePrice.ReturnToPool()
-	c.MinPrice.ReturnToPool()
-	c.OpenPrice.ReturnToPool()
+	// CRITICAL: values so need to keep
+	// volume := c.Volume
+	// volume.ReturnToPool()
 
-	*c = Candle{}
+	(&c.Volume).ReturnToPool()
+	(&c.MaxPrice).ReturnToPool()
+	(&c.ClosePrice).ReturnToPool()
+	(&c.MinPrice).ReturnToPool()
+	(&c.OpenPrice).ReturnToPool()
+
+	*c = Candle{} //nolint:exhaustivestruct
 	candlePool.Put(c)
 }
 
