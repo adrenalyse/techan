@@ -29,16 +29,12 @@ func (c *Candle) ReturnToPool() {
 	if c == nil {
 		return
 	}
-	volume := c.Volume
-	volume.ReturnToPool()
-	maxPrice := c.MaxPrice
-	maxPrice.ReturnToPool()
-	closePrice := c.ClosePrice
-	closePrice.ReturnToPool()
-	minPrice := c.MinPrice
-	minPrice.ReturnToPool()
-	openPrice := c.OpenPrice
-	openPrice.ReturnToPool()
+
+	c.Volume.ReturnToPool()
+	c.MaxPrice.ReturnToPool()
+	c.ClosePrice.ReturnToPool()
+	c.MinPrice.ReturnToPool()
+	c.OpenPrice.ReturnToPool()
 
 	*c = Candle{}
 	candlePool.Put(c)
