@@ -12,7 +12,7 @@ type TimeSeries struct {
 
 var timeSeriesPool = sync.Pool{
 	New: func() interface{} {
-		return &TimeSeries{}
+		return &TimeSeries{} //nolint:exhaustivestruct
 	},
 }
 
@@ -20,12 +20,16 @@ func (ts *TimeSeries) ReturnToPool() {
 	if ts == nil {
 		return
 	}
+
 	for _, candle := range ts.Candles {
 		candle.ReturnToPool()
 	}
+
 	f0 := ts.Candles[:0]
-	*ts = TimeSeries{}
+
+	*ts = TimeSeries{} //nolint:exhaustivestruct
 	ts.Candles = f0
+
 	timeSeriesPool.Put(ts)
 }
 

@@ -21,7 +21,7 @@ type Candle struct {
 
 var candlePool = sync.Pool{
 	New: func() interface{} {
-		return &Candle{}
+		return &Candle{} //nolint:exhaustivestruct
 	},
 }
 
@@ -29,26 +29,14 @@ func (c *Candle) ReturnToPool() {
 	if c == nil {
 		return
 	}
-	volume := c.Volume
-	volume.ReturnToPool()
-	maxPrice := c.MaxPrice
-	maxPrice.ReturnToPool()
-	closePrice := c.ClosePrice
-	closePrice.ReturnToPool()
-	minPrice := c.MinPrice
-	minPrice.ReturnToPool()
-	openPrice := c.OpenPrice
-	openPrice.ReturnToPool()
 
-	*c = Candle{
-		Period:     TimePeriod{},
-		OpenPrice:  openPrice,
-		ClosePrice: closePrice,
-		MaxPrice:   maxPrice,
-		MinPrice:   minPrice,
-		Volume:     volume,
-		TradeCount: 0,
-	}
+	c.Volume.ReturnToPool()
+	c.MaxPrice.ReturnToPool()
+	c.ClosePrice.ReturnToPool()
+	c.MinPrice.ReturnToPool()
+	c.OpenPrice.ReturnToPool()
+
+	*c = Candle{}
 	candlePool.Put(c)
 }
 
