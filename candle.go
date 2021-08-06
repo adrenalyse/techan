@@ -40,15 +40,7 @@ func (c *Candle) ReturnToPool() {
 	openPrice := c.OpenPrice
 	openPrice.ReturnToPool()
 
-	*c = Candle{
-		Period:     TimePeriod{},
-		OpenPrice:  openPrice,
-		ClosePrice: closePrice,
-		MaxPrice:   maxPrice,
-		MinPrice:   minPrice,
-		Volume:     volume,
-		TradeCount: 0,
-	}
+	*c = Candle{}
 	candlePool.Put(c)
 }
 
