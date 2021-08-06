@@ -2,7 +2,6 @@ package techan
 
 import (
 	"fmt"
-	big2 "math/big"
 	"strings"
 	"sync"
 
@@ -26,16 +25,6 @@ var candlePool = sync.Pool{
 	},
 }
 
-var bigFloatPool = sync.Pool{
-	New: func() interface{} {
-		return &big2.Float{}
-	},
-}
-
-func FloatFromPool() *big2.Float {
-	return bigFloatPool.Get().(*big2.Float)
-}
-
 func (c *Candle) ReturnToPool() {
 	if c == nil {
 		return
@@ -45,11 +34,11 @@ func (c *Candle) ReturnToPool() {
 	// volume := c.Volume
 	// volume.ReturnToPool()
 
-	bigFloatPool.Put(c.Volume.Fl)
-	bigFloatPool.Put(c.MaxPrice.Fl)
-	bigFloatPool.Put(c.MinPrice.Fl)
-	bigFloatPool.Put(c.ClosePrice.Fl)
-	bigFloatPool.Put(c.OpenPrice.Fl)
+	c.Volume.ReturnToPool()
+	c.MaxPrice.ReturnToPool()
+	c.MinPrice.ReturnToPool()
+	c.ClosePrice.ReturnToPool()
+	c.OpenPrice.ReturnToPool()
 
 	*c = Candle{} //nolint:exhaustivestruct
 	candlePool.Put(c)
