@@ -30,10 +30,6 @@ func (c *Candle) ReturnToPool() {
 		return
 	}
 
-	// CRITICAL: values so need to keep
-	// volume := c.Volume
-	// volume.ReturnToPool()
-
 	c.Volume.ReturnToPool()
 	c.MaxPrice.ReturnToPool()
 	c.MinPrice.ReturnToPool()
@@ -87,6 +83,29 @@ func (c *Candle) AddTrade(tradeAmount, tradePrice big.Decimal) {
 	}
 
 	c.TradeCount++
+}
+
+// Complete one candle fields with another one.
+func (c *Candle) Complete(candle *Candle) {
+	if c.Volume.NaN() {
+		c.Volume = candle.Volume
+	}
+
+	if c.MaxPrice.NaN() {
+		c.MaxPrice = candle.MaxPrice
+	}
+
+	if c.MinPrice.NaN() {
+		c.MinPrice = candle.MinPrice
+	}
+
+	if c.ClosePrice.NaN() {
+		c.ClosePrice = candle.ClosePrice
+	}
+
+	if c.OpenPrice.NaN() {
+		c.OpenPrice = candle.OpenPrice
+	}
 }
 
 func (c *Candle) String() string {
